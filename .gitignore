@@ -1,0 +1,33 @@
+# Secrets
+keys.yaml
+.env
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+venv/
+.venv/
+*.egg-info/
+
+# Experiment outputs (reproduce locally)
+experiments/logs/
+experiments/results/
+results/
+
+# Encoder predictions (download from HuggingFace)
+encoders_experiment/
+
+# Data (on HuggingFace)
+data/
+
+# macOS
+.DS_Store
+
+# Weights & Biases
+wandb/
+
+# Editor
+.idea/
+.vscode/

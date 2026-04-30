@@ -1,0 +1,6 @@
+# Copy this file to keys.yaml and fill in your API keys.
+# keys.yaml is gitignored — never commit your actual keys.
+OPENAI_API_KEY: "sk-..."
+GOOGLE_API_KEY: "..."
+ANTHROPIC_API_KEY: "sk-ant-..."
+TOGETHER_API_KEY: "..."
