@@ -113,21 +113,20 @@ def parse_list_col(val):
 
 
 def create_confusing_context_agent(num_variants: int = 3, language: str = "english"):
-    """Create an Agno agent for generating confusing context variants
+    """Create an Agno agent for generating confusing context variants.
 
     Args:
         num_variants: Number of variants to generate per sentence
-        language: Language to use ("english", "italian", "spanish", or "german")
+        language: Language to use ("english" or "german")
     """
+    lang = language.lower()
+    if lang not in ("english", "german"):
+        raise ValueError(
+            f"Language '{language}' is not supported for variant generation. "
+            "Supported languages: 'english', 'german'."
+        )
 
-    # Select the appropriate system prompt based on language
-    if language.lower() == "italian":
-        # system_prompt = SYSTEM_PROMPT_V3_ITALIAN.format(num_variants=num_variants)
-        return
-    elif language.lower() == "spanish":
-        # system_prompt = SYSTEM_PROMPT_V3_SPANISH.format(num_variants=num_variants)
-        return
-    elif language.lower() == "german":
+    if lang == "german":
         german_note = (
             "\n\nLANGUAGE: The input sentences are in German. "
             "Generate all {num_variants} variants in German only. "
