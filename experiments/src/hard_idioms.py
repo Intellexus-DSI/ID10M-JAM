@@ -12,6 +12,7 @@ from typing import Callable
 from pydantic import BaseModel
 from collections import Counter
 import ast
+from datasets import load_dataset
 
 
 from langchain_core.prompts import ChatPromptTemplate, FewShotChatMessagePromptTemplate
@@ -43,9 +44,11 @@ for lang in LANGUAGES:
         ]
     )
 
-# Get parent parent_dir
-parent_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-DATA_DIR = os.path.join(parent_dir, "data/hard_idioms_data/english/hard_idioms_english_FINAL.json")
+HF_DATASET_ID = "Intellexus/ID10M-JAM"
+_HF_DATA_FILES = {
+    "english": "data/english.json",
+    "german": "data/german.json",
+}
 
 ###############################################################################
 
@@ -135,16 +138,18 @@ def get_data(**kwargs) -> tuple[pd.DataFrame, pd.DataFrame]:
     :param kwargs: keyword arguments
     :return: data
     """
-    lang = kwargs.get("lang", "english")  # Get lang from kwargs, default to "english"
-    custom_data_path = kwargs.get("data_path", None)  # Support custom data path for correction runs
+    lang = kwargs.get("lang", "english")
+    custom_data_path = kwargs.get("data_path", None)
 
-    # Support custom data path for correction runs
     if custom_data_path:
         test = pd.read_json(custom_data_path)
     else:
-        test = pd.read_json(DATA_DIR)   # works when the top-level JSON is a list of dicts
+        if lang not in _HF_DATA_FILES:
+            raise ValueError(f"Language '{lang}' not supported. Choose from: {list(_HF_DATA_FILES)}")
+        ds = load_dataset(HF_DATASET_ID, data_files={lang: _HF_DATA_FILES[lang]}, split=lang)
+        test = ds.to_pandas()
 
-    test["language"] = lang  # Add language column based on config
+    test["language"] = lang
     return test
 
 

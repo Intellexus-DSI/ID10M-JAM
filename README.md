@@ -17,10 +17,10 @@ Both datasets are available on HuggingFace:
 
 ```python
 from datasets import load_dataset
-ds = load_dataset("PLACEHOLDER/idiojam-hard-idioms")
+ds = load_dataset("Intellexus/ID10M-JAM")
 ```
 
-> After downloading, place data files at `data/hard_idioms_data/` and `data/raw_id10m_data/` as expected by the experiment scripts.
+> The `hard_idioms` dataset is loaded automatically from HuggingFace by the experiment scripts. For the `id10m` task, download the id10m data files and place them at `data/raw_id10m_data/{language}/id10m_{language}_FINAL.json`.
 
 ---
 
@@ -136,8 +136,8 @@ Run analysis scripts from the repo root after running experiments:
 # Main LLM comparison table (id10m vs. hard_idioms)
 python analysis/compare_id10m_vs_hard_idioms.py
 
-# Legacy comparison table
-python analysis/generate_legacy_comparison_table.py
+# Per-run comparison table
+python analysis/generate_comparison_table.py
 
 # Confusion histograms (zero-shot and few-shot)
 python analysis/plot_confusion_histogram.py

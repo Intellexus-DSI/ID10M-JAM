@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """
-Generate a legacy-format comparison table with the same columns as the old
-IdioGem/comparisons/{lang}/model_comparison_table.csv.
+Generate a comparison table from per-run metrics.
 
 Reads from:
   - results/comparisons/{lang}/model_comparison_table.csv  (base metrics)
@@ -9,11 +8,11 @@ Reads from:
     (detailed per-run data: literal/idiomatic breakdown, per-idiom rates, examples)
 
 Outputs:
-  - results/comparisons/{lang}/model_comparison_table_legacy.csv
+  - results/comparisons/{lang}/model_comparison_table.csv
 
 Usage:
-    python analysis/generate_legacy_comparison_table.py --language english
-    python analysis/generate_legacy_comparison_table.py --language german
+    python analysis/generate_comparison_table.py --language english
+    python analysis/generate_comparison_table.py --language german
 """
 
 import json
@@ -64,10 +63,10 @@ def confused_examples(per_sentence: list, n: int = 10) -> list[str]:
 
 
 # ---------------------------------------------------------------------------
-# Build one row in legacy format
+# Build one row of the comparison table
 # ---------------------------------------------------------------------------
 
-def build_legacy_row(row: pd.Series, lang: str) -> dict:
+def build_comparison_row(row: pd.Series, lang: str) -> dict:
     model       = row["model"]
     prompt_type = row["prompt_type"]
     seed        = int(row["seed"])
@@ -212,10 +211,10 @@ def main():
     lang = args.language
 
     src_csv    = COMPARISONS_DIR / lang / "model_comparison_table.csv"
-    output_csv = COMPARISONS_DIR / lang / "model_comparison_table_legacy.csv"
+    output_csv = COMPARISONS_DIR / lang / "model_comparison_table.csv"
 
     print("=" * 70)
-    print(f"Generating legacy comparison table — {lang}")
+    print(f"Generating comparison table — {lang}")
     print("=" * 70)
 
     df = pd.read_csv(src_csv)
@@ -226,7 +225,7 @@ def main():
         row_dict = row._asdict()
         row_series = pd.Series(row_dict)
         print(f"[{i}/{len(df)}] {row.model} / {row.prompt_type} / seed {row.seed}")
-        rows.append(build_legacy_row(row_series, lang))
+        rows.append(build_comparison_row(row_series, lang))
 
     out_df = pd.DataFrame(rows, columns=COLUMN_ORDER)
     out_df = out_df.sort_values("hard_f1", ascending=False)

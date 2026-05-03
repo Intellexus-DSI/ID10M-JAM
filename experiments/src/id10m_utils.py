@@ -28,8 +28,6 @@ LABELS = list(LABEL2ID.keys())
 
 LANGUAGES = [
     "english",
-    "italian",
-    "spanish",
     "german",
 ]
 
@@ -45,9 +43,12 @@ for lang in LANGUAGES:
         ]
     )
 
-# Get parent parent_dir
-parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-DATA_DIR = os.path.join(parent_dir, "IdioGem/data/id10m")
+_REPO_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+DATA_DIR = os.path.join(_REPO_ROOT, "data", "raw_id10m_data")
+_LANG_JSON = {
+    "english": os.path.join(DATA_DIR, "english", "id10m_english_FINAL.json"),
+    "german": os.path.join(DATA_DIR, "german", "id10m_german_FINAL.json"),
+}
 
 ###############################################################################
 
@@ -204,15 +205,19 @@ def get_data(**kwargs) -> tuple[pd.DataFrame, pd.DataFrame]:
     """
     Get data for the given task and prompt type.
     :param kwargs: keyword arguments
-    :return: data
+    :return: (train, test) — train is None when no separate train split exists
     """
+    lang = kwargs.get("lang", None)
 
-    # Get data
-    test_dir = os.path.join(DATA_DIR, "testset")
+    if lang and lang in _LANG_JSON:
+        test = pd.read_json(_LANG_JSON[lang])
+    else:
+        # Load all languages
+        frames = [pd.read_json(p) for p in _LANG_JSON.values()]
+        test = pd.concat(frames, ignore_index=True)
+
     train_dir = os.path.join(DATA_DIR, "trainset")
-
-    train = _get_data(train_dir)
-    test = _get_data(test_dir)
+    train = _get_data(train_dir) if os.path.isdir(train_dir) else None
 
     return train, test
 

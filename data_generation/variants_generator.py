@@ -271,7 +271,7 @@ def generate_variants_dataframe(data_path: str, num_variants: int = 3, max_sente
         data_path: Path to the combined CSV (sentence, PIE, true_idioms, is_figurative, tokens, tags, tag_ids)
         num_variants: Number of variants to generate per sentence (default: 3)
         max_sentences: Maximum number of sentences to process (None for all)
-        language: Language to use ("english", "italian", "spanish", or "german")
+        language: Language to use ("english" or "german")
         offset: Number of sentences to skip from the beginning (default: 0)
         figurative_filter: If True, keep only figurative sentences; if False, only literal; if None, keep all
 
