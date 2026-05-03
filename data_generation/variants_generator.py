@@ -23,7 +23,7 @@ from datetime import datetime
 from dotenv import load_dotenv
 import os
 
-from system_prompts import SYSTEM_PROMPT_V2
+from system_prompts import SYSTEM_PROMPT
 
 # Load environment variables
 load_dotenv()
@@ -133,9 +133,9 @@ def create_confusing_context_agent(num_variants: int = 3, language: str = "engli
             "Generate all {num_variants} variants in German only. "
             "Maintain fluent, grammatically impeccable German."
         )
-        system_prompt = (SYSTEM_PROMPT_V2 + german_note).format(num_variants=num_variants)
+        system_prompt = (SYSTEM_PROMPT + german_note).format(num_variants=num_variants)
     else:
-        system_prompt = SYSTEM_PROMPT_V2.format(num_variants=num_variants)
+        system_prompt = SYSTEM_PROMPT.format(num_variants=num_variants)
 
     agent = Agent(
         model=model,
