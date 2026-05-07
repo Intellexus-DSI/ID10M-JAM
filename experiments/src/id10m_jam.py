@@ -4,10 +4,12 @@ Utils for the Idiom identification task.
 
 ###############################################################################
 # Imports
+import json
 import os
 import re
 import pandas as pd
 import random
+from pathlib import Path
 from typing import Callable
 from pydantic import BaseModel
 from collections import Counter
@@ -49,6 +51,20 @@ _HF_DATA_FILES = {
     "english": "data/english.json",
     "german": "data/german.json",
 }
+_LOCAL_DATA_DIR = Path(__file__).parent.parent.parent / "data" / "id10m_jam"
+
+
+def _ensure_local_data(lang: str) -> Path:
+    """Return path to local cache file, downloading from HuggingFace if needed."""
+    local_path = _LOCAL_DATA_DIR / f"{lang}.json"
+    if not local_path.exists():
+        print(f"[id10m_jam] Local data not found at {local_path}. Downloading from HuggingFace...")
+        _LOCAL_DATA_DIR.mkdir(parents=True, exist_ok=True)
+        ds = load_dataset(HF_DATASET_ID, data_files={lang: _HF_DATA_FILES[lang]}, split=lang)
+        with open(local_path, "w", encoding="utf-8") as f:
+            json.dump(ds.to_list(), f, ensure_ascii=False, indent=1)
+        print(f"[id10m_jam] Saved {len(ds)} rows → {local_path}")
+    return local_path
 
 ###############################################################################
 
@@ -146,8 +162,8 @@ def get_data(**kwargs) -> tuple[pd.DataFrame, pd.DataFrame]:
     else:
         if lang not in _HF_DATA_FILES:
             raise ValueError(f"Language '{lang}' not supported. Choose from: {list(_HF_DATA_FILES)}")
-        ds = load_dataset(HF_DATASET_ID, data_files={lang: _HF_DATA_FILES[lang]}, split=lang)
-        test = ds.to_pandas()
+        local_path = _ensure_local_data(lang)
+        test = pd.read_json(local_path)
 
     test["language"] = lang
     return test

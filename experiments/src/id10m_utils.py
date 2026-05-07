@@ -210,9 +210,20 @@ def get_data(**kwargs) -> tuple[pd.DataFrame, pd.DataFrame]:
     lang = kwargs.get("lang", None)
 
     if lang and lang in _LANG_JSON:
-        test = pd.read_json(_LANG_JSON[lang])
+        path = _LANG_JSON[lang]
+        if not os.path.exists(path):
+            raise FileNotFoundError(
+                f"id10m data not found at {path}.\n"
+                f"Place the file manually: data/raw_id10m_data/{lang}/id10m_{lang}_FINAL.json"
+            )
+        test = pd.read_json(path)
     else:
-        # Load all languages
+        missing = [p for p in _LANG_JSON.values() if not os.path.exists(p)]
+        if missing:
+            raise FileNotFoundError(
+                f"id10m data not found: {missing}.\n"
+                f"Place files manually at data/raw_id10m_data/{{language}}/id10m_{{language}}_FINAL.json"
+            )
         frames = [pd.read_json(p) for p in _LANG_JSON.values()]
         test = pd.concat(frames, ignore_index=True)
 
