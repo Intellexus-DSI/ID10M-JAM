@@ -43,7 +43,7 @@ logger = logging.getLogger(__name__)
 REPO_ROOT = Path(__file__).parent.parent
 
 ID10M_DIR      = REPO_ROOT / "results" / "id10m"
-HARD_DIR       = REPO_ROOT / "results" / "hard_idioms"
+HARD_DIR       = REPO_ROOT / "results" / "id10m_jam"
 COMPARISONS_DIR = REPO_ROOT / "results" / "comparisons"
 
 LANGUAGES = ["english", "german"]

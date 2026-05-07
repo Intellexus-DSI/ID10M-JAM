@@ -28,7 +28,7 @@ from typing import List, Dict, Tuple
 import pandas as pd
 
 ROOT = Path(__file__).resolve().parent.parent
-HARD_DIR = ROOT / "results" / "hard_idioms"
+HARD_DIR = ROOT / "results" / "id10m_jam"
 COMPARISON_DIR = ROOT / "results" / "comparisons"
 
 

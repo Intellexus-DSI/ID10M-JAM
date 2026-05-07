@@ -33,7 +33,7 @@ import matplotlib.pyplot as plt
 
 REPO_ROOT = Path(__file__).parent.parent
 
-HARD_DIR  = REPO_ROOT / "results" / "hard_idioms"
+HARD_DIR  = REPO_ROOT / "results" / "id10m_jam"
 ID10M_DIR = REPO_ROOT / "results" / "id10m"
 PLOTS_DIR = REPO_ROOT / "results" / "plots"
 

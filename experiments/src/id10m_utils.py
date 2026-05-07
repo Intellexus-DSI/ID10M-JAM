@@ -15,9 +15,9 @@ from collections import Counter
 
 from langchain_core.prompts import ChatPromptTemplate, FewShotChatMessagePromptTemplate
 
-from src.utils import FEW_SHOT_PROMPT_TEMPLATE, MERGE_COLUMNS, read_tsv, clean_predictions, make_examples
-from src.pydantic_schemas import PYDANTIC_SCHEMAS
-from src.typed_schemas import TYPED_SCHEMAS
+from utils.utils import FEW_SHOT_PROMPT_TEMPLATE, MERGE_COLUMNS, read_tsv, clean_predictions, make_examples
+from utils.pydantic_schemas import PYDANTIC_SCHEMAS
+from utils.typed_schemas import TYPED_SCHEMAS
 
 ###############################################################################
 

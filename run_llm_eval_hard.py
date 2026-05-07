@@ -1,11 +1,11 @@
 """
-LLM evaluation runner for the hard_idioms task with self-consistency support.
+LLM evaluation runner for the id10m_jam task with self-consistency support.
 
 Run from the repo root:
     python run_llm_eval_hard.py
     python run_llm_eval_hard.py --seed 43 --lang german --sc_runs 5
     python run_llm_eval_hard.py --config_file my_config.yaml
-    python run_llm_eval_hard.py --responses_dir experiments/logs/hard_idioms/english/<exp_name>/run_001
+    python run_llm_eval_hard.py --responses_dir experiments/logs/id10m_jam/english/<exp_name>/run_001
 """
 
 import sys
@@ -24,17 +24,17 @@ import pandas as pd
 from transformers import set_seed
 from datetime import datetime
 
-from src.utils import (
+from utils.utils import (
     MERGE_COLUMNS,
     get_logger,
     set_keys,
     calc_metrics_classification,
     parse_response,
 )
-from src.models import get_model
+from utils.models import get_model
 
 from src.id10m_utils import ID10M_UTILS
-from src.hard_idioms import HARD_IDIOMS_UTILS
+from src.id10m_jam import ID10M_JAM_UTILS
 
 
 # Define the command-line arguments
@@ -80,11 +80,11 @@ def get_task_utils(task: str):
     if task == "id10m":
         utils = ID10M_UTILS
         calc_metrics = calc_metrics_classification
-    elif task == "hard_idioms":
-        utils = HARD_IDIOMS_UTILS
+    elif task == "id10m_jam":
+        utils = ID10M_JAM_UTILS
         calc_metrics = calc_metrics_classification
     else:
-        raise ValueError(f"Task '{task}' is not supported. Choose from: id10m, hard_idioms")
+        raise ValueError(f"Task '{task}' is not supported. Choose from: id10m, id10m_jam")
     return Namespace(
         get_data=utils["get_data"],
         get_prompt_schema=utils["get_prompt_schema"],
@@ -165,7 +165,7 @@ def main():
             config["temperature"] == 0.8
         ), "Temperature must be 0.8 for self-consistency"
 
-    if config["lang"] and config["task"] in ["id10m", "hard_idioms"]:
+    if config["lang"] and config["task"] in ["id10m", "id10m_jam"]:
         task_res_dir = os.path.join(
             config["results_dir"], config["task"], config["lang"]
         )
@@ -188,7 +188,7 @@ def main():
         run_number = os.path.basename(exp_dir)
         logger.info(f"Resuming run from {exp_dir}")
     else:
-        if config["lang"] and config["task"] in ["id10m", "hard_idioms"]:
+        if config["lang"] and config["task"] in ["id10m", "id10m_jam"]:
             mother_dir = os.path.join(config["logs_dir"], config["task"], config["lang"])
         else:
             mother_dir = os.path.join(config["logs_dir"], config["task"])

@@ -2,7 +2,7 @@
 
 **ACL 2026** · [[Paper]]() · [[Dataset (HuggingFace)]]()
 
-ID10M-JAM evaluates idiom identification under challenging confusing-context conditions. We benchmark 10 LLMs across English and German on two tasks: **id10m** — a standard idiom identification task — and **hard_idioms** — our new benchmark where each idiom-containing sentence is paired with LLM-generated confusing-context variants designed to mislead models into literal interpretations.
+ID10M-JAM evaluates idiom identification under challenging confusing-context conditions. We benchmark 10 LLMs across English and German on two tasks: **id10m** — a standard idiom identification task — and **id10m-jam** — our new benchmark where each idiom-containing sentence is paired with LLM-generated confusing-context variants designed to mislead models into literal interpretations.
 
 ---
 
@@ -12,7 +12,7 @@ Both datasets are available on HuggingFace:
 
 | Dataset | Description | Languages | Size |
 |---|---|---|---|
-| `hard_idioms` | Idiom identification with confusing-context variants (ours) | English, German | 534 EN / 561 DE |
+| `id10m-jam` | Idiom identification with confusing-context variants (ours) | English, German | 534 EN / 561 DE |
 | `id10m` | Standard idiom identification baseline | English, German | 178 EN |
 
 ```python
@@ -20,7 +20,13 @@ from datasets import load_dataset
 ds = load_dataset("Intellexus/ID10M-JAM")
 ```
 
-> The `hard_idioms` dataset is loaded automatically from HuggingFace by the experiment scripts. For the `id10m` task, download the id10m data files and place them at `data/raw_id10m_data/{language}/id10m_{language}_FINAL.json`.
+Download all datasets locally:
+
+```bash
+python data/download.py
+```
+
+> `id10m-jam` is also loaded automatically from HuggingFace by the experiment scripts (no manual download needed). For the `id10m` task, place data files at `data/raw_id10m_data/{language}/id10m_{language}_FINAL.json`.
 
 ---
 
@@ -28,10 +34,13 @@ ds = load_dataset("Intellexus/ID10M-JAM")
 
 | Path | Purpose |
 |---|---|
-| `experiments/src/` | Task utilities for `hard_idioms` and `id10m` (data loading, prompts, metrics) |
-| `data_generation/` | Gemini-based pipeline that generated the confusing-context variants |
+| `experiments/src/` | Task utilities for `id10m_jam` and `id10m` (data loading, prompts, metrics) |
+| `utils/` | Shared utilities: metrics, LLM wrappers, schemas |
+| `data/generation/` | Gemini-based pipeline that generated the confusing-context variants |
+| `data/download.py` | Download datasets from HuggingFace |
 | `analysis/` | Scripts to reproduce all plots and comparison tables from the paper |
-| `encoders_experiment/` | Place downloaded BERT encoder predictions here before running encoder analysis |
+| `encoders/` | BERT encoder experiments (predictions downloaded from HuggingFace) |
+| `assets/` | Paper figures |
 
 ---
 
@@ -50,7 +59,7 @@ cp keys.yaml.example keys.yaml
 # Edit keys.yaml with your OPENAI_API_KEY, GOOGLE_API_KEY, ANTHROPIC_API_KEY, TOGETHER_API_KEY
 ```
 
-Run a zero-shot evaluation (GPT-4o-mini, hard_idioms, English):
+Run a zero-shot evaluation (GPT-4o-mini, id10m-jam, English):
 
 ```bash
 python run_llm_eval_hard.py
@@ -68,7 +77,7 @@ Edit `config.yaml` to configure your task, model, and prompt type, then run:
 # id10m task
 python run_llm_eval.py
 
-# hard_idioms task (supports self-consistency)
+# id10m-jam task (supports self-consistency)
 python run_llm_eval_hard.py
 
 # Override config values via CLI
@@ -76,14 +85,14 @@ python run_llm_eval_hard.py --seed 43 --lang german --sc_runs 5
 python run_llm_eval_hard.py --config_file my_config.yaml
 
 # Re-evaluate existing responses without calling the API
-python run_llm_eval_hard.py --responses_dir experiments/logs/hard_idioms/english/<exp_name>/run_001
+python run_llm_eval_hard.py --responses_dir experiments/logs/id10m_jam/english/<exp_name>/run_001
 ```
 
 ### Key Config Parameters (`config.yaml`)
 
 | Parameter | Options | Description |
 |---|---|---|
-| `task` | `hard_idioms`, `id10m` | Task to run |
+| `task` | `id10m_jam`, `id10m` | Task to run |
 | `lang` | `english`, `german` | Language |
 | `model` | see table below | LLM to evaluate |
 | `prompt_type` | `zero_shot`, `few_shot_cot_best` | Prompting strategy |
@@ -103,10 +112,10 @@ python run_llm_eval_hard.py --responses_dir experiments/logs/hard_idioms/english
 
 ### Experiment Outputs
 
-Outputs are written to `experiments/logs/{task}/{lang}/{exp_name}/`:
+Each run writes to `experiments/logs/{task}/{lang}/{exp_name}/run_NNN/`:
 
 ```
-experiments/logs/hard_idioms/english/<exp_name>/run_001/
+experiments/logs/id10m_jam/english/<exp_name>/run_001/
     config.yaml               # experiment config snapshot
     responses.json            # raw LLM responses
     metrics.json              # precision / recall / F1
@@ -114,30 +123,38 @@ experiments/logs/hard_idioms/english/<exp_name>/run_001/
     conf_matrices_reports.txt
 ```
 
----
-
-## Encoder Experiments
-
-1. Download BERT encoder prediction files from HuggingFace and place them at `encoders_experiment/{language}/{model_name}/`
-2. Run the analysis:
-
-```bash
-python analysis/generate_encoder_comparison_tables.py
-python analysis/generate_encoder_comparison_tables.py --language english
-```
+Aggregate results per task are written to `experiments/results/{task}/{lang}/full_results.csv`.
 
 ---
 
 ## Reproducing Paper Results
 
-Run analysis scripts from the repo root after running experiments:
+### Step 1 — Run experiments
 
 ```bash
-# Main LLM comparison table (id10m vs. hard_idioms)
-python analysis/compare_id10m_vs_hard_idioms.py
+# id10m baseline
+python run_llm_eval.py
 
+# id10m-jam benchmark
+python run_llm_eval_hard.py
+```
+
+### Step 2 — Compute comparisons (id10m vs. id10m-jam)
+
+```bash
+python analysis/compare_id10m_vs_hard_idioms.py
+# Outputs: results/comparisons/{lang}/model_comparison_table.csv
+#          results/comparisons/{lang}/{model}/{prompt}/seed_{N}/metrics.json
+```
+
+### Step 3 — Generate analysis tables and plots
+
+```bash
 # Per-run comparison table
 python analysis/generate_comparison_table.py
+
+# Main LLM comparison table (id10m vs. id10m-jam)
+python analysis/compare_id10m_vs_hard_idioms.py
 
 # Confusion histograms (zero-shot and few-shot)
 python analysis/plot_confusion_histogram.py
@@ -148,12 +165,24 @@ python analysis/sentence_confusion_analysis.py
 
 ---
 
-## Data Generation
+## Encoder Experiments
 
-The `data_generation/` folder contains the pipeline used to create the hard_idioms confusing-context variants using Gemini. Requires a Gemini API key in `.env`:
+1. Download BERT encoder prediction files from HuggingFace and place them at `encoders/predictions/{language}/{model_name}/`
+2. Run the analysis:
 
 ```bash
-cd data_generation
+python analysis/generate_encoder_comparison_tables.py
+python analysis/generate_encoder_comparison_tables.py --language english
+```
+
+---
+
+## Data Generation
+
+The `data/generation/` folder contains the pipeline used to create the id10m-jam confusing-context variants using Gemini. Requires a Gemini API key in `.env`:
+
+```bash
+cd data/generation
 python variants_generator.py
 ```
 
@@ -163,7 +192,7 @@ python variants_generator.py
 
 ### Zero-Shot English (seed 42)
 
-| Model | id10m F1 | hard_idioms F1 | Δ F1 |
+| Model | id10m F1 | id10m-jam F1 | Δ F1 |
 |---|---|---|---|
 | Gemini 2.5 Pro | .964 | .946 | −.018 |
 | Gemini 2.5 Flash-Lite | .959 | .923 | −.035 |

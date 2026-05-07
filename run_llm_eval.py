@@ -24,7 +24,7 @@ import pandas as pd
 from transformers import set_seed
 from datetime import datetime
 
-from src.utils import (
+from utils.utils import (
     MERGE_COLUMNS,
     get_logger,
     set_keys,
@@ -34,10 +34,10 @@ from src.utils import (
     calc_metrics_mwe,
     send_email
 )
-from src.models import get_model
+from utils.models import get_model
 
 from src.id10m_utils import ID10M_UTILS
-from src.hard_idioms import HARD_IDIOMS_UTILS
+from src.id10m_jam import ID10M_JAM_UTILS
 
 
 # Define the command-line arguments
@@ -71,11 +71,11 @@ def get_task_utils(task: str):
     if task == "id10m":
         utils = ID10M_UTILS
         calc_metrics = calc_metrics_classification
-    elif task == "hard_idioms":
-        utils = HARD_IDIOMS_UTILS
+    elif task == "id10m_jam":
+        utils = ID10M_JAM_UTILS
         calc_metrics = calc_metrics_classification
     else:
-        raise ValueError(f"Task '{task}' is not supported. Choose from: id10m, hard_idioms")
+        raise ValueError(f"Task '{task}' is not supported. Choose from: id10m, id10m_jam")
     return Namespace(
         get_data=utils["get_data"],
         get_prompt_schema=utils["get_prompt_schema"],
@@ -138,7 +138,7 @@ def main():
             config["temperature"] == 0.8
         ), "Temperature must be 0.8 for self-consistency"
 
-    if config["lang"] and config["task"] in ["id10m", "hard_idioms"]:
+    if config["lang"] and config["task"] in ["id10m", "id10m_jam"]:
         task_res_dir = os.path.join(
             config["results_dir"], config["task"], config["lang"]
         )
@@ -153,7 +153,7 @@ def main():
         task_res = pd.DataFrame(columns=MERGE_COLUMNS)
         task_res.to_csv(task_res_file, index=False)
 
-    if config["lang"] and config["task"] in ["id10m", "hard_idioms"]:
+    if config["lang"] and config["task"] in ["id10m", "id10m_jam"]:
         exp_dir = os.path.join(config["logs_dir"], config["task"], config["lang"], exp_name)
     else:
         exp_dir = os.path.join(config["logs_dir"], config["task"], exp_name)

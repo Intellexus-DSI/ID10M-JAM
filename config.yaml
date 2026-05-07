@@ -15,7 +15,7 @@ logs_dir: experiments/logs
 batched: True
 
 # Task
-task: hard_idioms # id10m, hard_idioms
+task: id10m_jam # id10m, id10m_jam
 lang: english # english, german
 
 data_path: null # Set to null to use default

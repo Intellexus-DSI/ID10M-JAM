@@ -17,9 +17,9 @@ from datasets import load_dataset
 
 from langchain_core.prompts import ChatPromptTemplate, FewShotChatMessagePromptTemplate
 
-from src.utils import FEW_SHOT_PROMPT_TEMPLATE, MERGE_COLUMNS, read_tsv, clean_predictions, make_examples
-from src.pydantic_schemas import PYDANTIC_SCHEMAS
-from src.typed_schemas import TYPED_SCHEMAS
+from utils.utils import FEW_SHOT_PROMPT_TEMPLATE, MERGE_COLUMNS, read_tsv, clean_predictions, make_examples
+from utils.pydantic_schemas import PYDANTIC_SCHEMAS
+from utils.typed_schemas import TYPED_SCHEMAS
 
 ###############################################################################
 
@@ -525,7 +525,7 @@ def process_responses(
 
 ###############################################################################
 # Export
-HARD_IDIOMS_UTILS = {
+ID10M_JAM_UTILS = {
     "get_data": get_data,
     "get_prompt_schema": get_prompt_schema,
     "get_user_inputs": get_user_inputs,

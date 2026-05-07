@@ -3,7 +3,7 @@
 Generate encoder comparison tables from Alon's new_results.json runs.
 
 Reads new_results.json (keyed by sentence → [{word, tag}]) for updated google_bert
-models, cross-references with hard_idioms FINAL.json as ground truth, and writes:
+models, cross-references with ID10M-JAM FINAL.json as ground truth, and writes:
   results/encoders/{language}/encoder_comparison_table.csv
   results/encoders/{language}/encoder_sentence_confusion_table.csv
 
@@ -27,7 +27,7 @@ from dataclasses import dataclass
 
 ROOT = Path(__file__).resolve().parent.parent
 
-ENCODERS_BASE = ROOT / "encoders_experiment"
+ENCODERS_BASE = ROOT / "encoders" / "predictions"
 
 UPDATED_MODELS = {
     "english": [
@@ -41,8 +41,8 @@ UPDATED_MODELS = {
 }
 
 FINAL_JSON_PATH = {
-    "english": ROOT / "data" / "hard_idioms_data" / "english" / "hard_idioms_english_FINAL.json",
-    "german": ROOT / "data" / "hard_idioms_data" / "german" / "hard_idioms_german_FINAL.json",
+    "english": ROOT / "data" / "id10m_jam" / "english.json",
+    "german": ROOT / "data" / "id10m_jam" / "german.json",
 }
 
 SEEDS = [5, 7, 42, 123, 1773]

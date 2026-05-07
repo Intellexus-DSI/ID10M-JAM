@@ -17,10 +17,11 @@ experiments/results/
 results/
 
 # Encoder predictions (download from HuggingFace)
-encoders_experiment/
+encoders/predictions/
 
-# Data (on HuggingFace)
-data/
+# Data files (on HuggingFace — scripts in data/ are tracked)
+data/raw_id10m_data/
+data/hard_idioms_data/
 
 # macOS
 .DS_Store

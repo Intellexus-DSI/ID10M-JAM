@@ -35,7 +35,7 @@ from scipy.stats import pearsonr, spearmanr
 
 from langchain_core.prompts import ChatPromptTemplate
 
-from src.bmc_munkres.munkres import Munkres
+from utils.bmc_munkres.munkres import Munkres
 
 
 ####################################################################################################
