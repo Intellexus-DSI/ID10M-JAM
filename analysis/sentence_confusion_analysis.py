@@ -2,7 +2,7 @@
 """
 Sentence-Level Confusion Analysis Script
 
-For each original sentence (grouped across all its hard_idioms variants), determines
+For each original sentence (grouped across all its id10m_jam variants), determines
 whether ALL variants confused the model, NO variants confused the model, or results
 were MIXED.
 
@@ -38,7 +38,7 @@ COMPARISON_DIR = ROOT / "results" / "comparisons"
 
 def _coerce_list(val) -> List[str]:
     """Convert a value to a list of strings.
-    Handles the German hard_idioms artifact where true_idioms is stored as
+    Handles the German id10m_jam artifact where true_idioms is stored as
     a Python repr string like \"['mitgehen lassen']\" instead of a real list.
     """
     if isinstance(val, list):
@@ -204,7 +204,7 @@ def select_examples(
 def process_model(model: str, prompt_type: str, seed: int, language: str) -> dict | None:
     """
     Load responses for one model config and return the analysis row dict.
-    Path: results/hard_idioms/{lang}/updated/{model}/{prompt_type}/seed_{seed}/responses.json
+    Path: results/id10m_jam/{lang}/updated/{model}/{prompt_type}/seed_{seed}/responses.json
     """
     run_dir = HARD_DIR / language / "updated" / model / prompt_type / f"seed_{seed}"
     responses_path = run_dir / "responses.json"

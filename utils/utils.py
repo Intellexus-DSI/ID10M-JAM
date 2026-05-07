@@ -109,7 +109,7 @@ def schema_to_dict_template(schema_class, task: str) -> dict:
                 elif field_name in {"idioms", "potential_idioms", "mwes", "vmwes"}:
                     template[field_name] = []
                 elif field_name == "explanation":
-                    if task in {"id10m", "magpie", "magpie_mini", "hard_id10m"}:
+                    if task in {"id10m", "magpie", "magpie_mini", "id10m_jam"}:
                         template[field_name] = "Let's explain this sentence and the potential idioms in it..."
                     elif task in {"coam", "parseme"}:
                         template[field_name] = "Let's explain the MWEs in the sentence and if they match the definition..."
@@ -133,7 +133,7 @@ def schema_to_dict_template(schema_class, task: str) -> dict:
                 elif field_name in {"idioms", "potential_idioms", "mwes", "vmwes"}:
                     template[field_name] = []
                 elif field_name == "explanation":
-                    if task in {"id10m", "magpie", "magpie_mini", "hard_id10m"}:
+                    if task in {"id10m", "magpie", "magpie_mini", "id10m_jam"}:
                         template[field_name] = "Let's explain this sentence and the potential idioms in it..."
                     elif task in {"coam", "parseme"}:
                         template[field_name] = "Let's explain the MWEs in the sentence and if they match the definition..."

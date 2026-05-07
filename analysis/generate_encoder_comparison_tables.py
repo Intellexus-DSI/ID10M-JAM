@@ -85,21 +85,21 @@ def load_final_json(language: str) -> List[Dict]:
 
 
 def load_new_results(language: str, model: str, seed: int) -> Optional[Dict]:
-    """Load id10m + hard_idioms split predictions and merge into a single dict.
+    """Load id10m + id10m_jam split predictions and merge into a single dict.
 
-    id10m keys are originals, hard_idioms keys are variants — no overlap expected.
+    id10m keys are originals, id10m_jam keys are variants — no overlap expected.
     """
     base = ENCODERS_BASE / language / model / f"seed_{seed}"
     id10m_path = base / "new_results_id10m.json"
-    hard_path = base / "new_results_hard_idioms.json"
-    if not id10m_path.exists() or not hard_path.exists():
+    jam_path = base / "new_results_id10m_jam.json"
+    if not id10m_path.exists() or not jam_path.exists():
         print(f"  SKIP: {base} missing split files")
         return None
     with open(id10m_path, encoding="utf-8") as f:
         id10m_preds = json.load(f)
-    with open(hard_path, encoding="utf-8") as f:
-        hard_preds = json.load(f)
-    return {**id10m_preds, **hard_preds}
+    with open(jam_path, encoding="utf-8") as f:
+        jam_preds = json.load(f)
+    return {**id10m_preds, **jam_preds}
 
 
 def parse_true_idioms(raw) -> List[str]:
@@ -256,8 +256,8 @@ def confusion_breakdown(data: List[Dict]) -> Dict:
     }
 
 
-def advanced_metrics(id10m: ConfusionMetrics, hard: ConfusionMetrics, data: List[Dict]) -> Dict:
-    cdi = (id10m.accuracy - hard.accuracy) / id10m.accuracy if id10m.accuracy else 0.0
+def advanced_metrics(id10m: ConfusionMetrics, jam: ConfusionMetrics, data: List[Dict]) -> Dict:
+    cdi = (id10m.accuracy - jam.accuracy) / id10m.accuracy if id10m.accuracy else 0.0
 
     ccr_count = total_count = 0
     lifr_count = lit_count = 0
@@ -282,8 +282,8 @@ def advanced_metrics(id10m: ConfusionMetrics, hard: ConfusionMetrics, data: List
                 lifr_count += 1
 
     id10m_err = 1 - id10m.accuracy
-    hard_err = 1 - hard.accuracy
-    eaf = hard_err / id10m_err if id10m_err else 1.0
+    jam_err = 1 - jam.accuracy
+    eaf = jam_err / id10m_err if id10m_err else 1.0
 
     confused_total = sum(
         1 for item in data
@@ -353,7 +353,7 @@ COMPARISON_FIELDNAMES = [
     "idiomatic_total_variants", "idiomatic_confused_variants", "idiomatic_confusion_percent",
     "context_helped", "context_hurt", "mixed_results", "no_change",
     "id10m_total_sentences", "id10m_accuracy", "id10m_precision", "id10m_recall", "id10m_f1", "id10m_mcc",
-    "hard_total_sentences", "hard_accuracy", "hard_precision", "hard_recall", "hard_f1", "hard_mcc",
+    "jam_total_sentences", "jam_accuracy", "jam_precision", "jam_recall", "jam_f1", "jam_mcc",
     "context_degradation_index", "variant_consistency_score", "context_confusion_rate",
     "literal_to_idiom_flip_rate", "error_amplification_factor", "confusion_resistance_score",
     "avg_confusion_rate", "highly_vulnerable_sentences",
@@ -375,10 +375,10 @@ def process_model_comparison(data: List[Dict], model: str, seed: int, language: 
     # All downstream metrics measure *context confusion*, not raw model accuracy.
     filtered = filter_orig_correct(data)
 
-    hard = calc_metrics(filtered, use_orig=False)
+    jam = calc_metrics(filtered, use_orig=False)
     ctx = context_effects(filtered)
     cb = confusion_breakdown(filtered)
-    adv = advanced_metrics(id10m, hard, filtered)
+    adv = advanced_metrics(id10m, jam, filtered)
     top = top_confused_idioms(filtered)
     ex = confused_examples(filtered)
 
@@ -410,12 +410,12 @@ def process_model_comparison(data: List[Dict], model: str, seed: int, language: 
         "id10m_recall": round(id10m.recall, 3),
         "id10m_f1": round(id10m.f1_score, 3),
         "id10m_mcc": round(id10m.mcc, 3),
-        "hard_total_sentences": hard.total,
-        "hard_accuracy": round(hard.accuracy, 3),
-        "hard_precision": round(hard.precision, 3),
-        "hard_recall": round(hard.recall, 3),
-        "hard_f1": round(hard.f1_score, 3),
-        "hard_mcc": round(hard.mcc, 3),
+        "jam_total_sentences": jam.total,
+        "jam_accuracy": round(jam.accuracy, 3),
+        "jam_precision": round(jam.precision, 3),
+        "jam_recall": round(jam.recall, 3),
+        "jam_f1": round(jam.f1_score, 3),
+        "jam_mcc": round(jam.mcc, 3),
         **{k: round(v, 3) if isinstance(v, float) else v for k, v in adv.items()},
         **{f"top_{i+1}_confused_idiom": top[i] for i in range(10)},
         **{f"confused_example_{i+1}": ex[i] for i in range(10)},
@@ -533,7 +533,7 @@ def run_language(language: str) -> None:
             row_comp = process_model_comparison(data, model, seed, language)
             comparison_rows.append(row_comp)
             print(f"  After filter: {row_comp['total_analyzed_sentences']} origs correctly classified, {row_comp['total_variants']} variants analyzed")
-            print(f"  id10m F1={row_comp['id10m_f1']:.3f}  hard F1={row_comp['hard_f1']:.3f}  confusion={row_comp['total_confusion_percent']}%")
+            print(f"  id10m F1={row_comp['id10m_f1']:.3f}  jam F1={row_comp['jam_f1']:.3f}  confusion={row_comp['total_confusion_percent']}%")
 
             row_sent = process_model_sentence_confusion(data, model, seed, language)
             if row_sent:

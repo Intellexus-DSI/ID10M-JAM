@@ -2,10 +2,10 @@
 LLM evaluation runner for the id10m_jam task with self-consistency support.
 
 Run from the repo root:
-    python run_llm_eval_hard.py
-    python run_llm_eval_hard.py --seed 43 --lang german --sc_runs 5
-    python run_llm_eval_hard.py --config_file my_config.yaml
-    python run_llm_eval_hard.py --responses_dir experiments/logs/id10m_jam/english/<exp_name>/run_001
+    python run_llm_eval_jam.py
+    python run_llm_eval_jam.py --seed 43 --lang german --sc_runs 5
+    python run_llm_eval_jam.py --config_file my_config.yaml
+    python run_llm_eval_jam.py --responses_dir experiments/logs/id10m_jam/english/<exp_name>/run_001
 """
 
 import sys

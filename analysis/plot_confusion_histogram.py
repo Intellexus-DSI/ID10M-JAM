@@ -1,15 +1,15 @@
 """
 Plot histogram of the number of models that experienced a negative context drift
-per hard variant (Figure 3 in the paper).
+per id10m-jam variant (Figure 3 in the paper).
 
-"Negative drift" = model was confused on the hard variant (FP or FN) but was
+"Negative drift" = model was confused on the id10m-jam variant (FP or FN) but was
 correct on the corresponding plain id10m sentence.  Encoder models (haiku) are
 excluded.
 
 For each language we:
-  1. Find every model that has BOTH hard_idioms and id10m results for the
+  1. Find every model that has BOTH id10m_jam and id10m results for the
      chosen prompt_type / seed.
-  2. Match hard variants to id10m sentences by normalized sentence text.
+  2. Match id10m-jam variants to id10m sentences by normalized sentence text.
   3. Per variant: count how many models show negative drift.
   4. Plot a histogram of those counts.
 
@@ -40,8 +40,8 @@ PLOTS_DIR = REPO_ROOT / "results" / "plots"
 # Models to exclude (encoder-only baselines)
 EXCLUDE_MODELS = {"claude-3-haiku-20240307"}
 
-# dir-name aliases: hard_idioms uses different casing than id10m in some models
-HARD_TO_ID10M_ALIASES = {
+# dir-name aliases: id10m_jam uses different casing than id10m in some models
+JAM_TO_ID10M_ALIASES = {
     "DeepSeek-R1": "deepseek-r1",
 }
 
@@ -115,37 +115,37 @@ def compute_variant_drifts(lang: str, prompt_type: str, seed: int):
       drift_counts  dict[variant_sentence -> int]  (models with negative drift)
       variant_rows  list[dict]  (full per-variant data for CSV export)
     """
-    hard_lang_dir  = HARD_DIR  / lang / "updated"
+    jam_lang_dir   = HARD_DIR  / lang / "updated"
     id10m_lang_dir = ID10M_DIR / lang / "updated"
 
     prompt_dir = "few_shot" if "few_shot" in prompt_type else "zero_shot"
     seed_dir   = f"seed_{seed}"
 
-    model_hard_dirs = {d.name: d for d in hard_lang_dir.iterdir() if d.is_dir()
-                       and d.name != "results_summary.csv"}
+    jam_model_dirs = {d.name: d for d in jam_lang_dir.iterdir() if d.is_dir()
+                      and d.name != "results_summary.csv"}
 
     # Per-variant accumulators
     # variant_sentence -> {metadata, confused_models, id10m_confused_models}
     variant_meta: dict[str, dict] = {}   # filled from first model that sees variant
-    hard_confused_by:  dict[str, list] = defaultdict(list)
+    jam_confused_by:  dict[str, list] = defaultdict(list)
     id10m_confused_by: dict[str, list] = defaultdict(list)
 
     models_used = []
 
-    for hard_model_name, hard_base in sorted(model_hard_dirs.items()):
-        if hard_model_name in EXCLUDE_MODELS:
+    for jam_model_name, jam_base in sorted(jam_model_dirs.items()):
+        if jam_model_name in EXCLUDE_MODELS:
             continue
 
-        hard_resp_path = hard_base / prompt_dir / seed_dir / "responses.json"
-        if not hard_resp_path.exists():
+        jam_resp_path = jam_base / prompt_dir / seed_dir / "responses.json"
+        if not jam_resp_path.exists():
             continue
 
-        id10m_model_name = HARD_TO_ID10M_ALIASES.get(hard_model_name, hard_model_name)
+        id10m_model_name = JAM_TO_ID10M_ALIASES.get(jam_model_name, jam_model_name)
         id10m_resp_path  = id10m_lang_dir / id10m_model_name / prompt_dir / seed_dir / "responses.json"
         if not id10m_resp_path.exists():
             continue
 
-        models_used.append(hard_model_name)
+        models_used.append(jam_model_name)
 
         # id10m lookup: normalized_sentence -> confused?
         id10m_data   = load_json(id10m_resp_path)
@@ -156,8 +156,8 @@ def compute_variant_drifts(lang: str, prompt_type: str, seed: int):
             pred = extract_predicted(item)
             id10m_lookup[norm] = is_confused(true, pred)
 
-        hard_data = load_json(hard_resp_path)
-        for item in hard_data:
+        jam_data = load_json(jam_resp_path)
+        for item in jam_data:
             vs        = item.get("variant_sentence", "").strip()
             orig_norm = normalize(item.get("sentence", ""))
             true      = coerce_list(item.get("true_idioms", []))
@@ -171,9 +171,9 @@ def compute_variant_drifts(lang: str, prompt_type: str, seed: int):
                 }
 
             if is_confused(true, pred):
-                hard_confused_by[vs].append(hard_model_name)
+                jam_confused_by[vs].append(jam_model_name)
             if id10m_lookup.get(orig_norm, False):
-                id10m_confused_by[vs].append(hard_model_name)
+                id10m_confused_by[vs].append(jam_model_name)
 
     total_models = len(models_used)
     print(f"  [{lang}] Models used ({total_models}): {models_used}")
@@ -183,7 +183,7 @@ def compute_variant_drifts(lang: str, prompt_type: str, seed: int):
     variant_rows: list[dict]     = []
 
     for vs, meta in variant_meta.items():
-        confused       = hard_confused_by[vs]
+        confused       = jam_confused_by[vs]
         id10m_confused = id10m_confused_by[vs]
         real_confused  = [m for m in confused if m not in id10m_confused]
 
@@ -248,7 +248,7 @@ def plot_histogram(drift_counts: dict, lang: str, prompt_type: str, seed: int, o
             ax.text(x, y + 1.5, str(y), ha="center", fontsize=10, fontweight="bold")
 
     ax.set_xlabel("Number of Models Confused", fontsize=LABEL_FONT)
-    ax.set_ylabel("Number of Hard Variants",   fontsize=LABEL_FONT)
+    ax.set_ylabel("Number of ID10M-JAM Variants", fontsize=LABEL_FONT)
     ax.set_xticks(range(1, max_val + 1))
     ax.set_xlim(0.5, max_val + 0.5)
     ax.set_ylim(0, max(freq.values()) * 1.15 + 5)
@@ -286,7 +286,7 @@ def plot_side_by_side(drift_en: dict, drift_de: dict, prompt_type: str, seed: in
                 ax.text(x, y + 1.5, str(y), ha="center", fontsize=10, fontweight="bold")
 
         ax.set_xlabel("Number of Models Confused", fontsize=LABEL_FONT)
-        ax.set_ylabel("Number of Hard Variants",   fontsize=LABEL_FONT)
+        ax.set_ylabel("Number of ID10M-JAM Variants", fontsize=LABEL_FONT)
         ax.set_xticks(range(1, max_val + 1))
         ax.set_xlim(0.5, max_val + 0.5)
         ax.set_ylim(0, max(freq.values()) * 1.15 + 5)

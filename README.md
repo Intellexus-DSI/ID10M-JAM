@@ -62,7 +62,7 @@ cp keys.yaml.example keys.yaml
 Run a zero-shot evaluation (GPT-4o-mini, id10m-jam, English):
 
 ```bash
-python run_llm_eval_hard.py
+python run_llm_eval_jam.py
 ```
 
 ---
@@ -78,14 +78,14 @@ Edit `config.yaml` to configure your task, model, and prompt type, then run:
 python run_llm_eval.py
 
 # id10m-jam task (supports self-consistency)
-python run_llm_eval_hard.py
+python run_llm_eval_jam.py
 
 # Override config values via CLI
-python run_llm_eval_hard.py --seed 43 --lang german --sc_runs 5
-python run_llm_eval_hard.py --config_file my_config.yaml
+python run_llm_eval_jam.py --seed 43 --lang german --sc_runs 5
+python run_llm_eval_jam.py --config_file my_config.yaml
 
 # Re-evaluate existing responses without calling the API
-python run_llm_eval_hard.py --responses_dir experiments/logs/id10m_jam/english/<exp_name>/run_001
+python run_llm_eval_jam.py --responses_dir experiments/logs/id10m_jam/english/<exp_name>/run_001
 ```
 
 ### Key Config Parameters (`config.yaml`)
@@ -136,13 +136,13 @@ Aggregate results per task are written to `experiments/results/{task}/{lang}/ful
 python run_llm_eval.py
 
 # id10m-jam benchmark
-python run_llm_eval_hard.py
+python run_llm_eval_jam.py
 ```
 
 ### Step 2 — Compute comparisons (id10m vs. id10m-jam)
 
 ```bash
-python analysis/compare_id10m_vs_hard_idioms.py
+python analysis/compare_id10m_vs_jam.py
 # Outputs: results/comparisons/{lang}/model_comparison_table.csv
 #          results/comparisons/{lang}/{model}/{prompt}/seed_{N}/metrics.json
 ```
@@ -154,7 +154,7 @@ python analysis/compare_id10m_vs_hard_idioms.py
 python analysis/generate_comparison_table.py
 
 # Main LLM comparison table (id10m vs. id10m-jam)
-python analysis/compare_id10m_vs_hard_idioms.py
+python analysis/compare_id10m_vs_jam.py
 
 # Confusion histograms (zero-shot and few-shot)
 python analysis/plot_confusion_histogram.py

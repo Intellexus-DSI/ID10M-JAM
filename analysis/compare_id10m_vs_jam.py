@@ -1,9 +1,9 @@
 """
-Batch comparison: id10m vs hard_idioms (updated FINAL dataset).
+Batch comparison: id10m vs id10m_jam (updated FINAL dataset).
 
 For each model/prompt/seed that exists in BOTH result sets, computes:
   - id10m metrics on the matched sentence subset
-  - hard_idioms metrics on the same sentences' variants
+  - id10m_jam metrics on the same sentences' variants
   - Advanced context-confusion metrics (CDI, VCS, CCR, EAF, etc.)
 
 Outputs per-run:
@@ -15,11 +15,11 @@ Outputs aggregated:
   results/comparisons/{lang}/model_comparison_table.csv
 
 Usage:
-    python analysis/compare_id10m_vs_hard_idioms.py                     # all langs
-    python analysis/compare_id10m_vs_hard_idioms.py --lang english
-    python analysis/compare_id10m_vs_hard_idioms.py --lang german
-    python analysis/compare_id10m_vs_hard_idioms.py --dry_run
-    python analysis/compare_id10m_vs_hard_idioms.py --filter gpt-4o-mini
+    python analysis/compare_id10m_vs_jam.py                     # all langs
+    python analysis/compare_id10m_vs_jam.py --lang english
+    python analysis/compare_id10m_vs_jam.py --lang german
+    python analysis/compare_id10m_vs_jam.py --dry_run
+    python analysis/compare_id10m_vs_jam.py --filter gpt-4o-mini
 """
 
 import argparse
@@ -134,7 +134,7 @@ def normalize_sentence(s: str) -> str:
 def _extract_predicted_idioms(item: dict) -> List[str]:
     """Extract predicted idiom list from a responses.json entry.
     Handles two formats:
-      - New: responses[0].parsed.idioms  (hard_idioms + newer id10m runs)
+      - New: responses[0].parsed.idioms  (id10m_jam + newer id10m runs)
       - Old: responses[0].idioms         (older id10m runs)
     """
     def _parse_idioms(idioms):
@@ -159,7 +159,7 @@ def _extract_predicted_idioms(item: dict) -> List[str]:
         elif isinstance(parsed, list):
             return _parse_idioms(parsed)
 
-        # Old format: idioms directly on response
+        # Old format: idioms directly on response (older id10m runs)
         if "idioms" in resp:
             return _parse_idioms(resp["idioms"])
 
@@ -188,7 +188,7 @@ def load_id10m(path: Path) -> List[SentenceData]:
 
 
 def _coerce_list(val) -> List[str]:
-    """Handle true_idioms stored as a Python-repr string (German hard_idioms artifact).
+    """Handle true_idioms stored as a Python-repr string (German id10m_jam artifact).
     Converts e.g. \"['mitgehen lassen']\" to ['mitgehen lassen'] without eval.
     """
     if isinstance(val, list):
@@ -202,7 +202,7 @@ def _coerce_list(val) -> List[str]:
     return tokens if tokens else []
 
 
-def load_hard_idioms(path: Path) -> List[SentenceData]:
+def load_id10m_jam(path: Path) -> List[SentenceData]:
     data = load_json(path)
     out = []
     for item in data:
@@ -211,25 +211,25 @@ def load_hard_idioms(path: Path) -> List[SentenceData]:
             normalized_sentence=normalize_sentence(item["sentence"]),
             true_idioms=_coerce_list(item.get("true_idioms", [])),
             predicted_idioms=_extract_predicted_idioms(item),
-            source_dataset="hard_idioms",
+            source_dataset="id10m_jam",
             variant_number=item.get("variant_number"),
-            variant_sentence=item.get("variant_sentence"),   # new field name
+            variant_sentence=item.get("variant_sentence"),
         ))
     return out
 
 
 def find_matches(id10m_sents: List[SentenceData],
-                 hard_sents: List[SentenceData]) -> Dict[str, dict]:
-    """Return dict keyed by normalized sentence with id10m + hard_idioms variants."""
+                 jam_sents: List[SentenceData]) -> Dict[str, dict]:
+    """Return dict keyed by normalized sentence with id10m + id10m_jam variants."""
     id10m_lut = {s.normalized_sentence: s for s in id10m_sents}
-    hard_lut: Dict[str, List[SentenceData]] = defaultdict(list)
-    for s in hard_sents:
-        hard_lut[s.normalized_sentence].append(s)
+    jam_lut: Dict[str, List[SentenceData]] = defaultdict(list)
+    for s in jam_sents:
+        jam_lut[s.normalized_sentence].append(s)
 
     matches = {}
     for norm, sent in id10m_lut.items():
-        if norm in hard_lut:
-            matches[norm] = {"id10m": sent, "hard_idioms": hard_lut[norm]}
+        if norm in jam_lut:
+            matches[norm] = {"id10m": sent, "id10m_jam": jam_lut[norm]}
     return matches
 
 
@@ -295,7 +295,7 @@ def compare(matches: Dict[str, dict]) -> dict:
     results = {
         "sentence_comparisons": [],
         "id10m_metrics": ConfusionMetrics(),
-        "hard_idioms_metrics": ConfusionMetrics(),
+        "id10m_jam_metrics": ConfusionMetrics(),
         "context_effects": {"helped": [], "hurt": [], "no_change": [], "mixed": []},
         "vcs_scores": [],
         "psi_scores": [],
@@ -303,17 +303,17 @@ def compare(matches: Dict[str, dict]) -> dict:
 
     for norm, data in matches.items():
         id10m_s = data["id10m"]
-        variants = data["hard_idioms"]
+        variants = data["id10m_jam"]
 
         id10m_ct = analyze_confusion(id10m_s.true_idioms, id10m_s.predicted_idioms)
         _update_metrics(results["id10m_metrics"], id10m_ct)
 
         variant_results = []
-        hard_cts = []
+        jam_cts = []
         for v in variants:
             vct = analyze_confusion(v.true_idioms, v.predicted_idioms)
-            _update_metrics(results["hard_idioms_metrics"], vct)
-            hard_cts.append(vct)
+            _update_metrics(results["id10m_jam_metrics"], vct)
+            jam_cts.append(vct)
             variant_results.append({
                 "variant_number": v.variant_number,
                 "variant_sentence": v.variant_sentence,
@@ -321,7 +321,7 @@ def compare(matches: Dict[str, dict]) -> dict:
                 "confusion_type": vct,
             })
 
-        effect = analyze_context_effect(id10m_ct, hard_cts)
+        effect = analyze_context_effect(id10m_ct, jam_cts)
         confused_count = sum(1 for vr in variant_results
                              if vr["confusion_type"] not in ("correct_detection", "correct_rejection"))
         total_v = len(variants)
@@ -334,7 +334,7 @@ def compare(matches: Dict[str, dict]) -> dict:
                 "predicted_idioms": id10m_s.predicted_idioms,
                 "confusion_type": id10m_ct,
             },
-            "hard_idioms_variants": variant_results,
+            "id10m_jam_variants": variant_results,
             "context_effect": effect,
             "variant_confusion_stats": {
                 "total": total_v,
@@ -351,12 +351,12 @@ def compare(matches: Dict[str, dict]) -> dict:
 
     # Advanced metrics
     id10m_m = results["id10m_metrics"]
-    hard_m  = results["hard_idioms_metrics"]
+    jam_m   = results["id10m_jam_metrics"]
     comps   = results["sentence_comparisons"]
 
     adv = AdvancedMetrics()
     adv.context_degradation_index = (
-        (id10m_m.accuracy - hard_m.accuracy) / id10m_m.accuracy
+        (id10m_m.accuracy - jam_m.accuracy) / id10m_m.accuracy
         if id10m_m.accuracy else 0.0
     )
     adv.variant_consistency_score = float(np.mean(results["vcs_scores"])) if results["vcs_scores"] else 0.0
@@ -365,7 +365,7 @@ def compare(matches: Dict[str, dict]) -> dict:
     ccr_num = ccr_den = 0
     for c in comps:
         id10m_ok = c["id10m"]["confusion_type"] in ("correct_detection", "correct_rejection")
-        for vr in c["hard_idioms_variants"]:
+        for vr in c["id10m_jam_variants"]:
             ccr_den += 1
             if id10m_ok and vr["confusion_type"] not in ("correct_detection", "correct_rejection"):
                 ccr_num += 1
@@ -376,22 +376,22 @@ def compare(matches: Dict[str, dict]) -> dict:
     for c in comps:
         if c["id10m"]["confusion_type"] == "correct_rejection":
             lifr_lit += 1
-            if any(vr["confusion_type"] == "false_positive" for vr in c["hard_idioms_variants"]):
+            if any(vr["confusion_type"] == "false_positive" for vr in c["id10m_jam_variants"]):
                 lifr_flip += 1
     adv.literal_to_idiom_flip_rate = lifr_flip / lifr_lit if lifr_lit else 0.0
 
     # EAF
     id10m_err = 1 - id10m_m.accuracy
-    hard_err  = 1 - hard_m.accuracy
+    jam_err   = 1 - jam_m.accuracy
     adv.error_amplification_factor = (
-        hard_err / id10m_err if id10m_err else (float("inf") if hard_err else 1.0)
+        jam_err / id10m_err if id10m_err else (float("inf") if jam_err else 1.0)
     )
 
     # Phrase overlap confusion rate
     poc_num = poc_den = 0
     for c in comps:
         sw = set(c["normalized_sentence"].lower().split())
-        for vr in c["hard_idioms_variants"]:
+        for vr in c["id10m_jam_variants"]:
             vs = vr.get("variant_sentence") or ""
             vw = set(vs.lower().split())
             if len(sw & vw) > 2:
@@ -404,7 +404,7 @@ def compare(matches: Dict[str, dict]) -> dict:
     crs_scores = []
     for c in comps:
         if c["id10m"]["confusion_type"] in ("correct_detection", "correct_rejection"):
-            confused = sum(1 for vr in c["hard_idioms_variants"]
+            confused = sum(1 for vr in c["id10m_jam_variants"]
                            if vr["confusion_type"] not in ("correct_detection", "correct_rejection"))
             crs_scores.append(confused)
     adv.confusion_resistance_score = float(np.mean(crs_scores)) if crs_scores else 0.0
@@ -445,10 +445,10 @@ def _detailed_confusion(comps: list) -> dict:
             "true_idioms": true_idioms,
             "id10m_confusion_type": c["id10m"]["confusion_type"],
             "confused_variants": 0,
-            "total_variants": len(c["hard_idioms_variants"]),
+            "total_variants": len(c["id10m_jam_variants"]),
             "variant_details": [],
         }
-        for vr in c["hard_idioms_variants"]:
+        for vr in c["id10m_jam_variants"]:
             is_confused = vr["confusion_type"] not in ("correct_detection", "correct_rejection")
             row["variant_details"].append({
                 "variant_number": vr["variant_number"],
@@ -503,7 +503,7 @@ def _detailed_confusion(comps: list) -> dict:
 
 def write_report(results: dict, path: Path):
     id10m_m = results["id10m_metrics"]
-    hard_m  = results["hard_idioms_metrics"]
+    jam_m   = results["id10m_jam_metrics"]
     adv     = results["advanced_metrics"]
     effects = results["context_effects"]
     comps   = results["sentence_comparisons"]
@@ -512,7 +512,7 @@ def write_report(results: dict, path: Path):
     def pct(x): return f"{x/n*100:.1f}%" if n else "N/A"
 
     lines = [
-        "ID10M vs Hard_idioms Comparison Report",
+        "ID10M vs ID10M-JAM Comparison Report",
         "=" * 50, "",
         "OVERALL PERFORMANCE METRICS (matched sentences only)",
         "-" * 30,
@@ -527,16 +527,16 @@ def write_report(results: dict, path: Path):
         f"  MCC:        {id10m_m.mcc:.3f}",
         f"  TP:{id10m_m.correct_detection}  TN:{id10m_m.correct_rejection}  FP:{id10m_m.false_positive}  FN:{id10m_m.false_negative}",
         "",
-        f"Hard_idioms Dataset (variants of matched sentences):",
-        f"  Total rows:  {hard_m.total}",
-        f"  Accuracy:   {hard_m.accuracy:.3f}",
-        f"  Precision:  {hard_m.precision:.3f}",
-        f"  Recall:     {hard_m.recall:.3f}",
-        f"  Specificity:{hard_m.specificity:.3f}",
-        f"  F1-Score:   {hard_m.f1_score:.3f}",
-        f"  Bal. Acc:   {hard_m.balanced_accuracy:.3f}",
-        f"  MCC:        {hard_m.mcc:.3f}",
-        f"  TP:{hard_m.correct_detection}  TN:{hard_m.correct_rejection}  FP:{hard_m.false_positive}  FN:{hard_m.false_negative}",
+        f"ID10M-JAM Dataset (variants of matched sentences):",
+        f"  Total rows:  {jam_m.total}",
+        f"  Accuracy:   {jam_m.accuracy:.3f}",
+        f"  Precision:  {jam_m.precision:.3f}",
+        f"  Recall:     {jam_m.recall:.3f}",
+        f"  Specificity:{jam_m.specificity:.3f}",
+        f"  F1-Score:   {jam_m.f1_score:.3f}",
+        f"  Bal. Acc:   {jam_m.balanced_accuracy:.3f}",
+        f"  MCC:        {jam_m.mcc:.3f}",
+        f"  TP:{jam_m.correct_detection}  TN:{jam_m.correct_rejection}  FP:{jam_m.false_positive}  FN:{jam_m.false_negative}",
         "",
         "CONTEXT EFFECTS SUMMARY",
         "-" * 25,
@@ -632,7 +632,7 @@ def write_metrics_json(results: dict, path: Path):
             "comparison_timestamp": datetime.now().isoformat(),
         },
         "id10m_metrics": m2d(results["id10m_metrics"]),
-        "hard_idioms_metrics": m2d(results["hard_idioms_metrics"]),
+        "id10m_jam_metrics": m2d(results["id10m_jam_metrics"]),
         "advanced_metrics": {
             "context_degradation_index": adv.context_degradation_index,
             "variant_consistency_score": adv.variant_consistency_score,
@@ -661,7 +661,7 @@ def write_metrics_json(results: dict, path: Path):
                 "normalized_sentence": c["normalized_sentence"],
                 "true_idioms": c["true_idioms"],
                 "id10m": c["id10m"],
-                "hard_idioms_variants": c["hard_idioms_variants"],
+                "id10m_jam_variants": c["id10m_jam_variants"],
                 "context_effect": c["context_effect"],
                 "variant_confusion_stats": c["variant_confusion_stats"],
             }
@@ -682,9 +682,9 @@ SUMMARY_FIELDS = [
     # id10m
     "id10m_accuracy", "id10m_precision", "id10m_recall", "id10m_f1", "id10m_mcc",
     "id10m_tp", "id10m_tn", "id10m_fp", "id10m_fn",
-    # hard_idioms
-    "hard_accuracy", "hard_precision", "hard_recall", "hard_f1", "hard_mcc",
-    "hard_tp", "hard_tn", "hard_fp", "hard_fn",
+    # id10m_jam
+    "jam_accuracy", "jam_precision", "jam_recall", "jam_f1", "jam_mcc",
+    "jam_tp", "jam_tn", "jam_fp", "jam_fn",
     # advanced
     "context_degradation_index", "variant_consistency_score", "context_confusion_rate",
     "literal_to_idiom_flip_rate", "error_amplification_factor",
@@ -700,7 +700,7 @@ SUMMARY_FIELDS = [
 
 def build_summary_row(model, prompt_type, seed, shots, sc_runs, temperature, lang, results):
     id10m_m = results["id10m_metrics"]
-    hard_m  = results["hard_idioms_metrics"]
+    jam_m   = results["id10m_jam_metrics"]
     adv     = results["advanced_metrics"]
     effects = results["context_effects"]
     vls     = results["variant_level_stats"]
@@ -724,13 +724,13 @@ def build_summary_row(model, prompt_type, seed, shots, sc_runs, temperature, lan
         "id10m_mcc":       id10m_m.mcc,
         "id10m_tp": id10m_m.correct_detection, "id10m_tn": id10m_m.correct_rejection,
         "id10m_fp": id10m_m.false_positive,    "id10m_fn": id10m_m.false_negative,
-        "hard_accuracy":  hard_m.accuracy,
-        "hard_precision": hard_m.precision,
-        "hard_recall":    hard_m.recall,
-        "hard_f1":        hard_m.f1_score,
-        "hard_mcc":       hard_m.mcc,
-        "hard_tp": hard_m.correct_detection, "hard_tn": hard_m.correct_rejection,
-        "hard_fp": hard_m.false_positive,    "hard_fn": hard_m.false_negative,
+        "jam_accuracy":  jam_m.accuracy,
+        "jam_precision": jam_m.precision,
+        "jam_recall":    jam_m.recall,
+        "jam_f1":        jam_m.f1_score,
+        "jam_mcc":       jam_m.mcc,
+        "jam_tp": jam_m.correct_detection, "jam_tn": jam_m.correct_rejection,
+        "jam_fp": jam_m.false_positive,    "jam_fn": jam_m.false_negative,
         "context_degradation_index":   adv.context_degradation_index,
         "variant_consistency_score":   adv.variant_consistency_score,
         "context_confusion_rate":      adv.context_confusion_rate,
@@ -765,13 +765,13 @@ def _read_config(run_dir: Path) -> dict:
 
 def discover_runs(lang: str, filter_str: Optional[str] = None):
     """
-    Walk results/hard_idioms/{lang}/updated/ and find matching id10m runs.
-    Yields (model, prompt_type, seed, hard_responses_path, id10m_responses_path, cfg).
+    Walk results/id10m_jam/{lang}/updated/ and find matching id10m runs.
+    Yields (model, prompt_type, seed, jam_responses_path, id10m_responses_path, cfg).
     """
-    hard_base = HARD_DIR / lang / "updated"
+    jam_base = HARD_DIR / lang / "updated"
     id10m_base = ID10M_DIR / lang
 
-    for model_dir in sorted(hard_base.iterdir()):
+    for model_dir in sorted(jam_base.iterdir()):
         if not model_dir.is_dir():
             continue
         model = model_dir.name
@@ -788,17 +788,17 @@ def discover_runs(lang: str, filter_str: Optional[str] = None):
                     continue
                 seed = int(seed_dir.name.split("_")[1])
 
-                hard_resp = seed_dir / "responses.json"
+                jam_resp = seed_dir / "responses.json"
                 id10m_resp = id10m_base / "updated" / model / prompt_type / f"seed_{seed}" / "responses.json"
 
-                if not hard_resp.exists():
+                if not jam_resp.exists():
                     continue
                 if not id10m_resp.exists():
                     logger.debug(f"No id10m match for {model}/{prompt_type}/seed_{seed} — skipping")
                     continue
 
                 cfg = _read_config(seed_dir)
-                yield model, prompt_type, seed, hard_resp, id10m_resp, cfg
+                yield model, prompt_type, seed, jam_resp, id10m_resp, cfg
 
 
 ####################################################################################################
@@ -812,7 +812,7 @@ def run_all(lang: str, filter_str: Optional[str], dry_run: bool):
     runs = list(discover_runs(lang, filter_str))
     logger.info(f"[{lang}] Found {len(runs)} matching run pairs")
 
-    for model, prompt_type, seed, hard_resp, id10m_resp, cfg in runs:
+    for model, prompt_type, seed, jam_resp, id10m_resp, cfg in runs:
         label = f"{model}/{prompt_type}/seed_{seed}"
         if dry_run:
             logger.info(f"  DRY RUN: {label}")
@@ -824,8 +824,8 @@ def run_all(lang: str, filter_str: Optional[str], dry_run: bool):
         logger.info(f"  Comparing {label} ...")
         try:
             id10m_sents = load_id10m(id10m_resp)
-            hard_sents  = load_hard_idioms(hard_resp)
-            matches     = find_matches(id10m_sents, hard_sents)
+            jam_sents   = load_id10m_jam(jam_resp)
+            matches     = find_matches(id10m_sents, jam_sents)
 
             if not matches:
                 logger.warning(f"    No matched sentences — skipping")
@@ -844,10 +844,10 @@ def run_all(lang: str, filter_str: Optional[str], dry_run: bool):
             summary_rows.append(row)
 
             id10m_m = results["id10m_metrics"]
-            hard_m  = results["hard_idioms_metrics"]
+            jam_m   = results["id10m_jam_metrics"]
             adv     = results["advanced_metrics"]
             logger.info(
-                f"    id10m F1={id10m_m.f1_score:.3f}  hard F1={hard_m.f1_score:.3f}  "
+                f"    id10m F1={id10m_m.f1_score:.3f}  jam F1={jam_m.f1_score:.3f}  "
                 f"CDI={adv.context_degradation_index:.3f}  CCR={adv.context_confusion_rate:.3f}"
             )
 
