@@ -5,7 +5,7 @@ Run from the repo root:
     python run_id10m.py
     python run_id10m.py --lang german
     python run_id10m.py --config_file my_config.yaml
-    python run_id10m.py --responses_dir experiments/logs/id10m/english/some_exp/
+    python run_id10m.py --responses_dir results/id10m/english/<model>/<prompt_type>/seed_42
 """
 
 import sys
@@ -153,10 +153,10 @@ def main():
         task_res = pd.DataFrame(columns=MERGE_COLUMNS)
         task_res.to_csv(task_res_file, index=False)
 
-    if config["lang"] and config["task"] in ["id10m", "id10m_jam"]:
-        exp_dir = os.path.join(config["logs_dir"], config["task"], config["lang"], exp_name)
-    else:
-        exp_dir = os.path.join(config["logs_dir"], config["task"], exp_name)
+    exp_dir = os.path.join(
+        config["results_dir"], config["task"], config["lang"],
+        model_name, config["prompt_type"], f"seed_{config['seed']}"
+    )
     os.makedirs(exp_dir, exist_ok=True)
 
     config["experiment_start_date"] = datetime.now().strftime("%Y-%m-%d")

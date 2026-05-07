@@ -11,17 +11,12 @@ venv/
 .venv/
 *.egg-info/
 
-# Experiment outputs (reproduce locally)
-experiments/logs/
-experiments/results/
-results/
-
 # Encoder predictions (download from HuggingFace)
 encoders/predictions/
 
 # Data files (on HuggingFace — scripts in data/ are tracked)
 data/raw_id10m_data/
-data/hard_idioms_data/
+data/id10m_jam/
 
 # macOS
 .DS_Store

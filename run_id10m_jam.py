@@ -5,7 +5,7 @@ Run from the repo root:
     python run_id10m_jam.py
     python run_id10m_jam.py --seed 43 --lang german --sc_runs 5
     python run_id10m_jam.py --config_file my_config.yaml
-    python run_id10m_jam.py --responses_dir experiments/logs/id10m_jam/english/<exp_name>/run_001
+    python run_id10m_jam.py --responses_dir results/id10m_jam/english/<model>/<prompt_type>/seed_42
 """
 
 import sys
@@ -94,24 +94,6 @@ def get_task_utils(task: str):
     )
 
 
-def create_run_directory(base_exp_dir: str) -> str:
-    os.makedirs(base_exp_dir, exist_ok=True)
-    existing_runs = []
-    if os.path.exists(base_exp_dir):
-        for item in os.listdir(base_exp_dir):
-            item_path = os.path.join(base_exp_dir, item)
-            if os.path.isdir(item_path) and item.startswith('run_'):
-                try:
-                    run_num = int(item.split('_')[1])
-                    existing_runs.append(run_num)
-                except (IndexError, ValueError):
-                    continue
-    next_run = max(existing_runs) + 1 if existing_runs else 1
-    run_dir_name = f"run_{next_run:03d}"
-    run_dir_path = os.path.join(base_exp_dir, run_dir_name)
-    os.makedirs(run_dir_path, exist_ok=True)
-    return run_dir_path
-
 
 def main():
     logger = get_logger(__name__)
@@ -185,17 +167,14 @@ def main():
         exp_dir = os.path.abspath(resume_dir)
         if not os.path.isdir(exp_dir):
             raise ValueError(f"--resume_dir does not exist: {exp_dir}")
-        run_number = os.path.basename(exp_dir)
         logger.info(f"Resuming run from {exp_dir}")
     else:
-        if config["lang"] and config["task"] in ["id10m", "id10m_jam"]:
-            mother_dir = os.path.join(config["logs_dir"], config["task"], config["lang"])
-        else:
-            mother_dir = os.path.join(config["logs_dir"], config["task"])
-        base_exp_dir = os.path.join(mother_dir, exp_name)
-        exp_dir = create_run_directory(base_exp_dir)
+        exp_dir = os.path.join(
+            config["results_dir"], config["task"], config["lang"],
+            model_name, config["prompt_type"], f"seed_{config['seed']}"
+        )
+        os.makedirs(exp_dir, exist_ok=True)
         logger.info(f"Created experiment directory: {exp_dir}")
-        run_number = os.path.basename(exp_dir)
 
     config["experiment_start_date"] = datetime.now().strftime("%Y-%m-%d")
     config["experiment_start_timestamp"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")

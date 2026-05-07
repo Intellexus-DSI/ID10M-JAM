@@ -10,8 +10,7 @@ seed: 42
 use_rate_limiter: False # Use rate limiter to avoid hitting the API too fast
 
 # Directories
-results_dir: experiments/results
-logs_dir: experiments/logs
+results_dir: results
 batched: True
 
 # Task

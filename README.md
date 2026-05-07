@@ -85,7 +85,7 @@ python run_id10m_jam.py --seed 43 --lang german --sc_runs 5
 python run_id10m_jam.py --config_file my_config.yaml
 
 # Re-evaluate existing responses without calling the API
-python run_id10m_jam.py --responses_dir experiments/logs/id10m_jam/english/<exp_name>/run_001
+python run_id10m_jam.py --responses_dir results/id10m_jam/english/<model>/<prompt_type>/seed_42
 ```
 
 ### Key Config Parameters (`config.yaml`)
@@ -112,10 +112,10 @@ python run_id10m_jam.py --responses_dir experiments/logs/id10m_jam/english/<exp_
 
 ### Experiment Outputs
 
-Each run writes to `experiments/logs/{task}/{lang}/{exp_name}/run_NNN/`:
+Each run writes to `results/{task}/{lang}/{model}/{prompt_type}/seed_{N}/`:
 
 ```
-experiments/logs/id10m_jam/english/<exp_name>/run_001/
+results/id10m_jam/english/<model>/<prompt_type>/seed_42/
     config.yaml               # experiment config snapshot
     responses.json            # raw LLM responses
     metrics.json              # precision / recall / F1
@@ -123,7 +123,7 @@ experiments/logs/id10m_jam/english/<exp_name>/run_001/
     conf_matrices_reports.txt
 ```
 
-Aggregate results per task are written to `experiments/results/{task}/{lang}/full_results.csv`.
+Aggregate results per task are written to `results/{task}/{lang}/full_results.csv`.
 
 ---
 

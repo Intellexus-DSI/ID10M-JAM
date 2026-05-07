@@ -115,8 +115,8 @@ def compute_variant_drifts(lang: str, prompt_type: str, seed: int):
       drift_counts  dict[variant_sentence -> int]  (models with negative drift)
       variant_rows  list[dict]  (full per-variant data for CSV export)
     """
-    jam_lang_dir   = HARD_DIR  / lang / "updated"
-    id10m_lang_dir = ID10M_DIR / lang / "updated"
+    jam_lang_dir   = HARD_DIR  / lang
+    id10m_lang_dir = ID10M_DIR / lang
 
     prompt_dir = "few_shot" if "few_shot" in prompt_type else "zero_shot"
     seed_dir   = f"seed_{seed}"

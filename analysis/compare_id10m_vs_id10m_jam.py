@@ -765,10 +765,10 @@ def _read_config(run_dir: Path) -> dict:
 
 def discover_runs(lang: str, filter_str: Optional[str] = None):
     """
-    Walk results/id10m_jam/{lang}/updated/ and find matching id10m runs.
+    Walk results/id10m_jam/{lang}/ and find matching id10m runs.
     Yields (model, prompt_type, seed, jam_responses_path, id10m_responses_path, cfg).
     """
-    jam_base = HARD_DIR / lang / "updated"
+    jam_base = HARD_DIR / lang
     id10m_base = ID10M_DIR / lang
 
     for model_dir in sorted(jam_base.iterdir()):
@@ -789,7 +789,7 @@ def discover_runs(lang: str, filter_str: Optional[str] = None):
                 seed = int(seed_dir.name.split("_")[1])
 
                 jam_resp = seed_dir / "responses.json"
-                id10m_resp = id10m_base / "updated" / model / prompt_type / f"seed_{seed}" / "responses.json"
+                id10m_resp = id10m_base / model / prompt_type / f"seed_{seed}" / "responses.json"
 
                 if not jam_resp.exists():
                     continue
