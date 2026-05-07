@@ -261,12 +261,12 @@ def _update_metrics(m: ConfusionMetrics, ctype: str):
     elif ctype == "false_negative":    m.false_negative += 1
 
 
-def analyze_context_effect(id10m_ct: str, hard_cts: List[str]) -> str:
+def analyze_context_effect(id10m_ct: str, id10m_jam_cts: List[str]) -> str:
     id10m_ok = id10m_ct in ("correct_detection", "correct_rejection")
-    hard_ok = [c in ("correct_detection", "correct_rejection") for c in hard_cts]
-    if all(hard_ok) and not id10m_ok:  return "helped"
-    if not any(hard_ok) and id10m_ok:  return "hurt"
-    if len(set(hard_ok)) > 1:          return "mixed"
+    id10m_jam_ok = [c in ("correct_detection", "correct_rejection") for c in id10m_jam_cts]
+    if all(id10m_jam_ok) and not id10m_ok:  return "helped"
+    if not any(id10m_jam_ok) and id10m_ok:  return "hurt"
+    if len(set(id10m_jam_ok)) > 1:          return "mixed"
     return "no_change"
 
 
