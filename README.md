@@ -62,7 +62,7 @@ cp keys.yaml.example keys.yaml
 Run a zero-shot evaluation (GPT-4o-mini, id10m-jam, English):
 
 ```bash
-python run_llm_eval_jam.py
+python run_id10m_jam.py
 ```
 
 ---
@@ -75,17 +75,17 @@ Edit `config.yaml` to configure your task, model, and prompt type, then run:
 
 ```bash
 # id10m task
-python run_llm_eval.py
+python run_id10m.py
 
 # id10m-jam task (supports self-consistency)
-python run_llm_eval_jam.py
+python run_id10m_jam.py
 
 # Override config values via CLI
-python run_llm_eval_jam.py --seed 43 --lang german --sc_runs 5
-python run_llm_eval_jam.py --config_file my_config.yaml
+python run_id10m_jam.py --seed 43 --lang german --sc_runs 5
+python run_id10m_jam.py --config_file my_config.yaml
 
 # Re-evaluate existing responses without calling the API
-python run_llm_eval_jam.py --responses_dir experiments/logs/id10m_jam/english/<exp_name>/run_001
+python run_id10m_jam.py --responses_dir experiments/logs/id10m_jam/english/<exp_name>/run_001
 ```
 
 ### Key Config Parameters (`config.yaml`)
@@ -133,10 +133,10 @@ Aggregate results per task are written to `experiments/results/{task}/{lang}/ful
 
 ```bash
 # id10m baseline
-python run_llm_eval.py
+python run_id10m.py
 
 # id10m-jam benchmark
-python run_llm_eval_jam.py
+python run_id10m_jam.py
 ```
 
 ### Step 2 — Compute comparisons (id10m vs. id10m-jam)
