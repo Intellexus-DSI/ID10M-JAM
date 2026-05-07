@@ -28,7 +28,7 @@ from typing import List, Dict, Tuple
 import pandas as pd
 
 ROOT = Path(__file__).resolve().parent.parent
-HARD_DIR = ROOT / "results" / "id10m_jam"
+ID10M_JAM_DIR = ROOT / "results" / "id10m_jam"
 COMPARISON_DIR = ROOT / "results" / "comparisons"
 
 
@@ -206,7 +206,7 @@ def process_model(model: str, prompt_type: str, seed: int, language: str) -> dic
     Load responses for one model config and return the analysis row dict.
     Path: results/id10m_jam/{lang}/{model}/{prompt_type}/seed_{seed}/responses.json
     """
-    run_dir = HARD_DIR / language / model / prompt_type / f"seed_{seed}"
+    run_dir = ID10M_JAM_DIR / language / model / prompt_type / f"seed_{seed}"
     responses_path = run_dir / "responses.json"
 
     if not responses_path.exists():

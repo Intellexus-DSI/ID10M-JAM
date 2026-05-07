@@ -43,7 +43,7 @@ logger = logging.getLogger(__name__)
 REPO_ROOT = Path(__file__).parent.parent
 
 ID10M_DIR      = REPO_ROOT / "results" / "id10m"
-HARD_DIR       = REPO_ROOT / "results" / "id10m_jam"
+ID10M_JAM_DIR  = REPO_ROOT / "results" / "id10m_jam"
 COMPARISONS_DIR = REPO_ROOT / "results" / "comparisons"
 
 LANGUAGES = ["english", "german"]
@@ -768,7 +768,7 @@ def discover_runs(lang: str, filter_str: Optional[str] = None):
     Walk results/id10m_jam/{lang}/ and find matching id10m runs.
     Yields (model, prompt_type, seed, jam_responses_path, id10m_responses_path, cfg).
     """
-    jam_base = HARD_DIR / lang
+    jam_base = ID10M_JAM_DIR / lang
     id10m_base = ID10M_DIR / lang
 
     for model_dir in sorted(jam_base.iterdir()):
