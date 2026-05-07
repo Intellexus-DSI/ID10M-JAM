@@ -142,7 +142,7 @@ python run_id10m_jam.py
 ### Step 2 — Compute comparisons (id10m vs. id10m-jam)
 
 ```bash
-python analysis/compare_id10m_vs_jam.py
+python analysis/compare_id10m_vs_id10m_jam.py
 # Outputs: results/comparisons/{lang}/model_comparison_table.csv
 #          results/comparisons/{lang}/{model}/{prompt}/seed_{N}/metrics.json
 ```
@@ -154,7 +154,7 @@ python analysis/compare_id10m_vs_jam.py
 python analysis/generate_comparison_table.py
 
 # Main LLM comparison table (id10m vs. id10m-jam)
-python analysis/compare_id10m_vs_jam.py
+python analysis/compare_id10m_vs_id10m_jam.py
 
 # Confusion histograms (zero-shot and few-shot)
 python analysis/plot_confusion_histogram.py

@@ -141,15 +141,15 @@ def build_comparison_row(row: pd.Series, lang: str) -> dict:
 
         # ID10M-JAM performance
         # Note: jam_total_sentences = total variant rows (not matched sentences)
-        "jam_total_sentences":  jam_total_rows,
-        "jam_accuracy":         float(row["jam_accuracy"]),
-        "jam_precision":        float(row["jam_precision"]),
-        "jam_recall":           float(row["jam_recall"]),
-        "jam_f1":               float(row["jam_f1"]),
-        "jam_mcc":              float(row["jam_mcc"]),
-        "jam_false_positives":  int(row["jam_fp"]),
-        "jam_false_negatives":  int(row["jam_fn"]),
-        "jam_total_errors":     int(row["jam_fp"]) + int(row["jam_fn"]),
+        "id10m_jam_total_sentences":  jam_total_rows,
+        "id10m_jam_accuracy":         float(row["id10m_jam_accuracy"]),
+        "id10m_jam_precision":        float(row["id10m_jam_precision"]),
+        "id10m_jam_recall":           float(row["id10m_jam_recall"]),
+        "id10m_jam_f1":               float(row["id10m_jam_f1"]),
+        "id10m_jam_mcc":              float(row["id10m_jam_mcc"]),
+        "id10m_jam_false_positives":  int(row["id10m_jam_fp"]),
+        "id10m_jam_false_negatives":  int(row["id10m_jam_fn"]),
+        "id10m_jam_total_errors":     int(row["id10m_jam_fp"]) + int(row["id10m_jam_fn"]),
 
         # Advanced context metrics
         "context_degradation_index":   float(row["context_degradation_index"]),
@@ -186,9 +186,9 @@ COLUMN_ORDER = [
     "context_helped", "context_hurt", "mixed_results", "no_change",
     "id10m_total_sentences", "id10m_correct_detections",
     "id10m_accuracy", "id10m_precision", "id10m_recall", "id10m_f1", "id10m_mcc",
-    "jam_total_sentences",
-    "jam_accuracy", "jam_precision", "jam_recall", "jam_f1", "jam_mcc",
-    "jam_false_positives", "jam_false_negatives", "jam_total_errors",
+    "id10m_jam_total_sentences",
+    "id10m_jam_accuracy", "id10m_jam_precision", "id10m_jam_recall", "id10m_jam_f1", "id10m_jam_mcc",
+    "id10m_jam_false_positives", "id10m_jam_false_negatives", "id10m_jam_total_errors",
     "context_degradation_index", "variant_consistency_score", "context_confusion_rate",
     "literal_to_idiom_flip_rate", "error_amplification_factor", "confusion_resistance_score",
     "avg_confusion_rate", "highly_vulnerable_sentences",
@@ -228,7 +228,7 @@ def main():
         rows.append(build_comparison_row(row_series, lang))
 
     out_df = pd.DataFrame(rows, columns=COLUMN_ORDER)
-    out_df = out_df.sort_values("jam_f1", ascending=False)
+    out_df = out_df.sort_values("id10m_jam_f1", ascending=False)
     out_df.to_csv(output_csv, index=False)
 
     print(f"\n✓ Written {len(out_df)} rows → {output_csv}")

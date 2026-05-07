@@ -15,11 +15,11 @@ Outputs aggregated:
   results/comparisons/{lang}/model_comparison_table.csv
 
 Usage:
-    python analysis/compare_id10m_vs_jam.py                     # all langs
-    python analysis/compare_id10m_vs_jam.py --lang english
-    python analysis/compare_id10m_vs_jam.py --lang german
-    python analysis/compare_id10m_vs_jam.py --dry_run
-    python analysis/compare_id10m_vs_jam.py --filter gpt-4o-mini
+    python analysis/compare_id10m_vs_id10m_jam.py                     # all langs
+    python analysis/compare_id10m_vs_id10m_jam.py --lang english
+    python analysis/compare_id10m_vs_id10m_jam.py --lang german
+    python analysis/compare_id10m_vs_id10m_jam.py --dry_run
+    python analysis/compare_id10m_vs_id10m_jam.py --filter gpt-4o-mini
 """
 
 import argparse
@@ -683,8 +683,8 @@ SUMMARY_FIELDS = [
     "id10m_accuracy", "id10m_precision", "id10m_recall", "id10m_f1", "id10m_mcc",
     "id10m_tp", "id10m_tn", "id10m_fp", "id10m_fn",
     # id10m_jam
-    "jam_accuracy", "jam_precision", "jam_recall", "jam_f1", "jam_mcc",
-    "jam_tp", "jam_tn", "jam_fp", "jam_fn",
+    "id10m_jam_accuracy", "id10m_jam_precision", "id10m_jam_recall", "id10m_jam_f1", "id10m_jam_mcc",
+    "id10m_jam_tp", "id10m_jam_tn", "id10m_jam_fp", "id10m_jam_fn",
     # advanced
     "context_degradation_index", "variant_consistency_score", "context_confusion_rate",
     "literal_to_idiom_flip_rate", "error_amplification_factor",
@@ -724,13 +724,13 @@ def build_summary_row(model, prompt_type, seed, shots, sc_runs, temperature, lan
         "id10m_mcc":       id10m_m.mcc,
         "id10m_tp": id10m_m.correct_detection, "id10m_tn": id10m_m.correct_rejection,
         "id10m_fp": id10m_m.false_positive,    "id10m_fn": id10m_m.false_negative,
-        "jam_accuracy":  jam_m.accuracy,
-        "jam_precision": jam_m.precision,
-        "jam_recall":    jam_m.recall,
-        "jam_f1":        jam_m.f1_score,
-        "jam_mcc":       jam_m.mcc,
-        "jam_tp": jam_m.correct_detection, "jam_tn": jam_m.correct_rejection,
-        "jam_fp": jam_m.false_positive,    "jam_fn": jam_m.false_negative,
+        "id10m_jam_accuracy":  jam_m.accuracy,
+        "id10m_jam_precision": jam_m.precision,
+        "id10m_jam_recall":    jam_m.recall,
+        "id10m_jam_f1":        jam_m.f1_score,
+        "id10m_jam_mcc":       jam_m.mcc,
+        "id10m_jam_tp": jam_m.correct_detection, "id10m_jam_tn": jam_m.correct_rejection,
+        "id10m_jam_fp": jam_m.false_positive,    "id10m_jam_fn": jam_m.false_negative,
         "context_degradation_index":   adv.context_degradation_index,
         "variant_consistency_score":   adv.variant_consistency_score,
         "context_confusion_rate":      adv.context_confusion_rate,
@@ -847,7 +847,7 @@ def run_all(lang: str, filter_str: Optional[str], dry_run: bool):
             jam_m   = results["id10m_jam_metrics"]
             adv     = results["advanced_metrics"]
             logger.info(
-                f"    id10m F1={id10m_m.f1_score:.3f}  jam F1={jam_m.f1_score:.3f}  "
+                f"    id10m F1={id10m_m.f1_score:.3f}  id10m_jam F1={jam_m.f1_score:.3f}  "
                 f"CDI={adv.context_degradation_index:.3f}  CCR={adv.context_confusion_rate:.3f}"
             )
 

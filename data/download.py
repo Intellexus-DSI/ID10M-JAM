@@ -3,7 +3,7 @@ Download ID10M-JAM and id10m datasets from HuggingFace to local data/ directorie
 
 Usage:
     python data/download.py                  # download all
-    python data/download.py --dataset jam    # only ID10M-JAM
+    python data/download.py --dataset id10m_jam  # only ID10M-JAM
     python data/download.py --dataset id10m  # only id10m
 """
 
@@ -42,13 +42,13 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--dataset",
-        choices=["jam", "id10m", "all"],
+        choices=["id10m_jam", "id10m", "all"],
         default="all",
         help="Which dataset to download",
     )
     args = parser.parse_args()
 
-    if args.dataset in ("jam", "all"):
+    if args.dataset in ("id10m_jam", "all"):
         download_id10m_jam()
     if args.dataset in ("id10m", "all"):
         download_id10m()
