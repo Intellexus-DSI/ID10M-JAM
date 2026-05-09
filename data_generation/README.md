@@ -8,19 +8,38 @@ The `id10m_fixed/` folder contains our cleaned version of the id10m dataset, use
 as the baseline in all experiments. English (178 sentences) and German (137
 sentences), in both JSON and CSV format.
 
-The original id10m dataset was manually reviewed and the following sentence types
-were removed:
+Each file contains the following columns:
+
+| Column | Description |
+|---|---|
+| `sentence` | Full sentence text |
+| `PIE` | Potentially idiomatic expression(s) present in the sentence |
+| `true_idioms` | Idioms used figuratively — the ground-truth labels |
+| `is_figurative` | Whether the sentence contains a figurative idiom use |
+| `tokens` | Tokenized sentence |
+| `tags` | BIO tags (`O`, `B-IDIOM`, `I-IDIOM`) |
+| `tag_ids` | Numeric BIO tag IDs |
+| `was_fixed` | `True` if the sentence was corrected or added during cleaning |
+
+### Cleaning process
+
+The original id10m dataset was manually reviewed. Sentences were removed or
+corrected for the following reasons:
 
 - **Dual-meaning sentences** — sentences where the idiom could plausibly be
   interpreted as either literal or figurative depending on context, making the
   ground-truth label ambiguous
 - **Multiple idioms in one sentence** — sentences containing more than one idiom,
-  which complicates the identification task and evaluation
+  which complicates identification and evaluation
 - **Nonsensical sentences** — sentences that did not form coherent, natural
   utterances (e.g. malformed constructions from the original data generation)
+- **Typos** — sentences with spelling or word errors in the original data
+  (e.g. "hand" instead of "head", missing spaces) were corrected and marked
+  `was_fixed = True`
 
 The result is a clean, unambiguous benchmark where each sentence has a
-well-defined ground truth.
+well-defined ground truth. English started from 200 sentences (22 removed, 8
+corrected or added). German started from a similar pool with 9 sentences corrected.
 
 ## id10m-jam
 
