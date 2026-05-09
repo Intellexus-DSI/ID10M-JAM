@@ -11,16 +11,13 @@ results, analysis, and discussion see the paper:
 
 ## Metrics
 
-The paper does **not** report F1 scores. The two core metrics are:
-
 - **S_M** — success count: the number of hard variants whose *original* sentence was
   correctly classified by model M. Out of 534 (English) and 411 (German).
 - **ND_M (%)** — negative drift: the proportion of those correctly-classified originals
   that flipped to an incorrect prediction on the hard variant. Lower is better (↓).
 
-ND_M isolates *adversarial robustness* independent of overall accuracy. A model can
-have high accuracy yet high ND_M (fragile under context), or moderate accuracy with
-low ND_M (robust).
+ND_M measures adversarial robustness independently of overall accuracy — a model can
+have high accuracy yet high ND_M, or moderate accuracy with low ND_M.
 
 ---
 
