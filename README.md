@@ -211,11 +211,17 @@ python variants_generator.py
 
 ## Citation
 
+If you use this work, please cite:
+
+**APA:**
+Hashiloni, K. G., Livyatan, L., Hefetz, O., Mannor, A., Cohen, B., & Bar, K. (2026). ID10M-JAM: Stress-Testing Idiom Identification Under Challenging Context. In *Proceedings of the 64th Annual Meeting of the Association for Computational Linguistics (ACL 2026)*.
+
+**BibTeX:**
 ```bibtex
-@inproceedings{idiojam2026,
-  title     = {ID10M-JAM: Stress-Testing Idiom Identification Under Challenging Context},
-  author    = {},
-  booktitle = {Proceedings of the 64th Annual Meeting of the Association for Computational Linguistics (ACL)},
+@inproceedings{hashiloni2026idiojam,
+  title     = {{ID10M-JAM}: Stress-Testing Idiom Identification Under Challenging Context},
+  author    = {Hashiloni, Kai Golan and Livyatan, Lior and Hefetz, Ofri and Mannor, Alon and Cohen, Bar and Bar, Kfir},
+  booktitle = {Proceedings of the 64th Annual Meeting of the Association for Computational Linguistics (ACL 2026)},
   year      = {2026},
 }
 ```
