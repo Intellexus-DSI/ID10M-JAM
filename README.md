@@ -6,31 +6,28 @@ ID10M-JAM evaluates idiom identification under challenging confusing-context con
 
 ---
 
-## Dataset
+## 📁 Dataset
 
-Both datasets are available on HuggingFace:
-
-| Dataset | Description | Languages | Size |
+| Dataset | Description | Languages | Availability |
 |---|---|---|---|
-| `id10m-jam` | Idiom identification with confusing-context variants (ours) | English, German | 534 EN / 411 DE |
-| `id10m` | Standard idiom identification baseline | English, German | 178 EN |
+| `id10m-jam` | Idiom identification with confusing-context variants (ours) | English, German | [HuggingFace](https://huggingface.co/datasets/Intellexus/ID10M-JAM) |
+| `id10m` | Standard idiom identification baseline (filtered & corrected for this paper) | English, German | `data_generation/id10m_fixed/` |
 
-```python
-from datasets import load_dataset
-ds = load_dataset("Intellexus/ID10M-JAM")
-```
+The original ID10M dataset is available on [GitHub](https://github.com/Babelscape/ID10M).
 
-Download id10m-jam locally:
+<div align="center">
+  <img src="assets/dataset_overview.png" alt="Dataset Overview" width="600"/>
+</div>
+
+No manual download needed — experiment scripts load `id10m-jam` automatically from HuggingFace, and `id10m` is committed at `data_generation/id10m_fixed/`. To download `id10m-jam` locally:
 
 ```bash
 python data_generation/download_id10m_jam.py
 ```
 
-> `id10m-jam` is also loaded automatically from HuggingFace by the experiment scripts (no manual download needed). The `id10m` dataset is committed at `data_generation/id10m_fixed/`.
-
 ---
 
-## Repository Overview
+## 📋 Repository Overview
 
 | Path | Purpose |
 |---|---|
@@ -40,12 +37,12 @@ python data_generation/download_id10m_jam.py
 | `data_generation/id10m_fixed/` | id10m dataset (English + German, JSON + CSV) |
 | `data_generation/download_id10m_jam.py` | Download id10m-jam from HuggingFace |
 | `analysis/` | Scripts to reproduce all plots and comparison tables from the paper |
-| `encoders/` | BERT encoder experiments (predictions downloaded from HuggingFace) |
+| `encoders/` | Encoder experiments |
 | `assets/` | Paper figures |
 
 ---
 
-## Quick Start
+## 🚀 Quick Start
 
 **Prerequisites:** Python 3.10+
 
@@ -68,7 +65,18 @@ python run_id10m_jam.py
 
 ---
 
-## Running Experiments
+## 🔧 Data Generation
+
+The `data_generation/generation/` folder contains the pipeline used to create the id10m-jam confusing-context variants using Gemini. Requires a Gemini API key in `.env`:
+
+```bash
+cd data_generation/generation
+python variants_generator.py
+```
+
+---
+
+## 🏃‍♂️ Running Experiments
 
 ### LLM Evaluation
 
@@ -128,7 +136,7 @@ Aggregate results per task are written to `results/{task}/{lang}/full_results.cs
 
 ---
 
-## Reproducing Paper Results
+## 📊 Reproducing Paper Results
 
 ### Step 1 — Run experiments
 
@@ -166,67 +174,55 @@ python analysis/sentence_confusion_analysis.py
 
 ---
 
-## Encoder Experiments
+## 🔬 Encoder Experiments
 
 For running the encoder experiments, see the [`encoders/`](encoders/) folder — it contains a dedicated `README.md` with full instructions.
 
 ---
 
-## Data Generation
+## 📈 Results
 
-The `data/generation/` folder contains the pipeline used to create the id10m-jam confusing-context variants using Gemini. Requires a Gemini API key in `.env`:
+<div align="center">
+  <img src="assets/id10m_jam_results.png" alt="ID10M-JAM Results" width="350" height="200"/>
+</div>
 
-```bash
-cd data/generation
-python variants_generator.py
-```
-
----
-
-## Results
-
-### Zero-Shot English (seed 42)
-
-| Model | id10m F1 | id10m-jam F1 | Δ F1 |
-|---|---|---|---|
-| Gemini 2.5 Pro | .964 | .946 | −.018 |
-| Gemini 2.5 Flash-Lite | .959 | .923 | −.035 |
-| Claude Sonnet 4 | .949 | .938 | −.011 |
-| GPT-4o | .945 | .937 | −.008 |
-| Llama 4 Scout | .939 | .950 | +.012 |
-| GPT-4o-mini | .942 | .942 | .000 |
-| o3-mini | .937 | .946 | +.009 |
-| Qwen 2.5 72B | .916 | .948 | +.032 |
-| DeepSeek-R1 | .925 | .929 | +.004 |
-
-> Full results (few-shot, German, self-consistency) are reported in the paper.
+> Full results and analysis are reported in the paper.
 
 ---
 
-## Citation
+## 📜 Citation
 
-If you use this work, please cite:
-
-**APA:**
-Hashiloni, K. G., Livyatan, L., Hefetz, O., Mannor, A., Cohen, B., & Bar, K. (2026). ID10M-JAM: Stress-Testing Idiom Identification Under Challenging Context. In *Proceedings of the 64th Annual Meeting of the Association for Computational Linguistics (ACL 2026)*.
+If you use ID10M-JAM in your research, please cite:
 
 **BibTeX:**
-```bibtex
-@inproceedings{hashiloni2026idiojam,
-  title     = {{ID10M-JAM}: Stress-Testing Idiom Identification Under Challenging Context},
-  author    = {Hashiloni, Kai Golan and Livyatan, Lior and Hefetz, Ofri and Mannor, Alon and Cohen, Bar and Bar, Kfir},
-  booktitle = {Proceedings of the 64th Annual Meeting of the Association for Computational Linguistics (ACL 2026)},
-  year      = {2026},
-}
-```
+
+<!-- TODO: add -->
+
+**APA:**
+
+<!-- TODO: add -->
 
 ---
 
-## License
+## 📄 License
 
 Code: Apache 2.0. See [LICENSE](LICENSE).
-Data: See the HuggingFace dataset card for data licensing terms.
+Data: [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/)
 
-## Contact
+---
+
+## Dataset Card Authors
+
+Kai Golan Hashiloni et al. ([Intellexus Project](https://intellexus.net/))
+
+## 📫 Dataset Card Contact
 
 For questions or contributions: [kai.golanhashiloni@post.runi.ac.il](mailto:kai.golanhashiloni@post.runi.ac.il?subject=ID10M-JAM)
+
+---
+
+<div align="center">
+  <img src="assets/Runi Logo.png" alt="Runi Logo" width="150"/>
+  <img src="assets/IL_RGB_Black_Gold.png" alt="IL Logo" width="150"/>
+  <img src="assets/UHH Logo.png" alt="UHH Logo" width="150"/>
+</div>

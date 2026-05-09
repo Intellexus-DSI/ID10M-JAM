@@ -11,7 +11,7 @@ venv/
 .venv/
 *.egg-info/
 
-# Encoder predictions (download from HuggingFace)
+# Encoder predictions
 encoders/predictions/
 
 # Data files (cache/downloads — committed data lives in data_generation/id10m_fixed/)
@@ -27,3 +27,6 @@ wandb/
 # Editor
 .idea/
 .vscode/
+
+# Claude
+.claude/
