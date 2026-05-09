@@ -51,7 +51,7 @@ _HF_DATA_FILES = {
     "english": "data/english.json",
     "german": "data/german.json",
 }
-_LOCAL_DATA_DIR = Path(__file__).parent.parent.parent / "data" / "id10m_jam"
+_LOCAL_DATA_DIR = Path(__file__).parent.parent.parent / "data_generation" / "id10m_jam"
 
 
 def _ensure_local_data(lang: str) -> Path:

@@ -41,8 +41,8 @@ UPDATED_MODELS = {
 }
 
 FINAL_JSON_PATH = {
-    "english": ROOT / "data" / "id10m_jam" / "english.json",
-    "german": ROOT / "data" / "id10m_jam" / "german.json",
+    "english": ROOT / "data_generation" / "id10m_jam" / "english.json",
+    "german": ROOT / "data_generation" / "id10m_jam" / "german.json",
 }
 
 SEEDS = [5, 7, 42, 123, 1773]

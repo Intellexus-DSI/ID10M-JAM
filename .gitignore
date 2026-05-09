@@ -14,9 +14,9 @@ venv/
 # Encoder predictions (download from HuggingFace)
 encoders/predictions/
 
-# Data files (on HuggingFace — scripts in data/ are tracked)
-data/raw_id10m_data/
-data/id10m_jam/
+# Data files (cache/downloads — committed data lives in data_generation/id10m_fixed/)
+data_generation/raw_id10m_data/
+data_generation/id10m_jam/
 
 # macOS
 .DS_Store

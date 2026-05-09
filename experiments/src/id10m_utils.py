@@ -44,10 +44,10 @@ for lang in LANGUAGES:
     )
 
 _REPO_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-DATA_DIR = os.path.join(_REPO_ROOT, "data", "raw_id10m_data")
+DATA_DIR = os.path.join(_REPO_ROOT, "data_generation", "id10m_fixed")
 _LANG_JSON = {
-    "english": os.path.join(DATA_DIR, "english", "id10m_english_FINAL.json"),
-    "german": os.path.join(DATA_DIR, "german", "id10m_german_FINAL.json"),
+    "english": os.path.join(DATA_DIR, "english.json"),
+    "german": os.path.join(DATA_DIR, "german.json"),
 }
 
 ###############################################################################
@@ -214,7 +214,7 @@ def get_data(**kwargs) -> tuple[pd.DataFrame, pd.DataFrame]:
         if not os.path.exists(path):
             raise FileNotFoundError(
                 f"id10m data not found at {path}.\n"
-                f"Place the file manually: data/raw_id10m_data/{lang}/id10m_{lang}_FINAL.json"
+                f"Expected: data_generation/id10m_fixed/{lang}.json"
             )
         test = pd.read_json(path)
     else:
@@ -222,7 +222,7 @@ def get_data(**kwargs) -> tuple[pd.DataFrame, pd.DataFrame]:
         if missing:
             raise FileNotFoundError(
                 f"id10m data not found: {missing}.\n"
-                f"Place files manually at data/raw_id10m_data/{{language}}/id10m_{{language}}_FINAL.json"
+                f"Expected: data_generation/id10m_fixed/{{language}}.json"
             )
         frames = [pd.read_json(p) for p in _LANG_JSON.values()]
         test = pd.concat(frames, ignore_index=True)
