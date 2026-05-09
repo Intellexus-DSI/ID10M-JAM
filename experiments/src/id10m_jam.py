@@ -14,7 +14,7 @@ from typing import Callable
 from pydantic import BaseModel
 from collections import Counter
 import ast
-from datasets import load_dataset
+from huggingface_hub import hf_hub_download
 
 
 from langchain_core.prompts import ChatPromptTemplate, FewShotChatMessagePromptTemplate
@@ -60,10 +60,16 @@ def _ensure_local_data(lang: str) -> Path:
     if not local_path.exists():
         print(f"[id10m_jam] Local data not found at {local_path}. Downloading from HuggingFace...")
         _LOCAL_DATA_DIR.mkdir(parents=True, exist_ok=True)
-        ds = load_dataset(HF_DATASET_ID, data_files={lang: _HF_DATA_FILES[lang]}, split=lang)
-        with open(local_path, "w", encoding="utf-8") as f:
-            json.dump(ds.to_list(), f, ensure_ascii=False, indent=1)
-        print(f"[id10m_jam] Saved {len(ds)} rows → {local_path}")
+        import shutil
+        cached = hf_hub_download(
+            repo_id=HF_DATASET_ID,
+            filename=_HF_DATA_FILES[lang],
+            repo_type="dataset",
+        )
+        shutil.copy(cached, local_path)
+        with open(local_path, encoding="utf-8") as f:
+            n = len(json.load(f))
+        print(f"[id10m_jam] Saved {n} rows → {local_path}")
     return local_path
 
 ###############################################################################

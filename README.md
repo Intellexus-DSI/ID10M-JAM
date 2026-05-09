@@ -20,13 +20,13 @@ from datasets import load_dataset
 ds = load_dataset("Intellexus/ID10M-JAM")
 ```
 
-Download all datasets locally:
+Download id10m-jam locally:
 
 ```bash
-python data/download.py
+python data_generation/download_id10m_jam.py
 ```
 
-> `id10m-jam` is also loaded automatically from HuggingFace by the experiment scripts (no manual download needed). For the `id10m` task, place data files at `data/raw_id10m_data/{language}/id10m_{language}_FINAL.json`.
+> `id10m-jam` is also loaded automatically from HuggingFace by the experiment scripts (no manual download needed). The `id10m` dataset is committed at `data_generation/id10m_fixed/`.
 
 ---
 
@@ -36,8 +36,9 @@ python data/download.py
 |---|---|
 | `experiments/src/` | Task utilities for `id10m_jam` and `id10m` (data loading, prompts, metrics) |
 | `utils/` | Shared utilities: metrics, LLM wrappers, schemas |
-| `data/generation/` | Gemini-based pipeline that generated the confusing-context variants |
-| `data/download.py` | Download datasets from HuggingFace |
+| `data_generation/generation/` | Gemini-based pipeline that generated the confusing-context variants |
+| `data_generation/id10m_fixed/` | id10m dataset (English + German, JSON + CSV) |
+| `data_generation/download_id10m_jam.py` | Download id10m-jam from HuggingFace |
 | `analysis/` | Scripts to reproduce all plots and comparison tables from the paper |
 | `encoders/` | BERT encoder experiments (predictions downloaded from HuggingFace) |
 | `assets/` | Paper figures |
