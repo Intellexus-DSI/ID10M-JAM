@@ -168,13 +168,7 @@ python analysis/sentence_confusion_analysis.py
 
 ## Encoder Experiments
 
-1. Download BERT encoder prediction files from HuggingFace and place them at `encoders/predictions/{language}/{model_name}/`
-2. Run the analysis:
-
-```bash
-python analysis/generate_encoder_comparison_tables.py
-python analysis/generate_encoder_comparison_tables.py --language english
-```
+For running the encoder experiments, see the [`encoders/`](encoders/) folder — it contains a dedicated `README.md` with full instructions.
 
 ---
 
