@@ -1,6 +1,6 @@
 # ID10M-JAM: Stress-Testing Idiom Identification Under Challenging Context
 
-**ACL 2026** · [[Paper]]() · [[Dataset (HuggingFace)]]()
+**ACL 2026** · [[Paper]]() · [[Dataset (HuggingFace)](https://huggingface.co/datasets/Intellexus/ID10M-JAM)]
 
 ID10M-JAM evaluates idiom identification under challenging confusing-context conditions. We benchmark 10 LLMs across English and German on two tasks: **id10m** — a standard idiom identification task — and **id10m-jam** — our new benchmark where each idiom-containing sentence is paired with LLM-generated confusing-context variants designed to mislead models into literal interpretations.
 
@@ -12,7 +12,7 @@ Both datasets are available on HuggingFace:
 
 | Dataset | Description | Languages | Size |
 |---|---|---|---|
-| `id10m-jam` | Idiom identification with confusing-context variants (ours) | English, German | 534 EN / 561 DE |
+| `id10m-jam` | Idiom identification with confusing-context variants (ours) | English, German | 534 EN / 411 DE |
 | `id10m` | Standard idiom identification baseline | English, German | 178 EN |
 
 ```python
@@ -235,4 +235,4 @@ Data: See the HuggingFace dataset card for data licensing terms.
 
 ## Contact
 
-For questions, open a GitHub issue or contact the authors.
+For questions or contributions: [kai.golanhashiloni@post.runi.ac.il](mailto:kai.golanhashiloni@post.runi.ac.il?subject=ID10M-JAM)
