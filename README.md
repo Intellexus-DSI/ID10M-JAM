@@ -39,6 +39,7 @@ python data_generation/download_id10m_jam.py
 | `analysis/` | Scripts to reproduce all plots and comparison tables from the paper |
 | `encoders/` | Encoder experiments |
 | `assets/` | Paper figures |
+| `data_generation/ID10M-JAM Annotation Guildlines.pdf` | Annotation guidelines used for the id10m-jam data generation |
 
 ---
 
@@ -184,6 +185,7 @@ For running the encoder experiments, see the [`encoders/`](encoders/) folder —
 
 <div align="center">
   <img src="assets/id10m_jam_results.png" alt="ID10M-JAM Results" width="350" height="200"/>
+  <img src="assets/id10m_accuracy.png" alt="ID10M Accuracy" width="350" height="200"/>
 </div>
 
 > Full results and analysis are reported in the paper.

@@ -55,6 +55,10 @@ python data_generation/download_id10m_jam.py
 This saves `english.json` and `german.json` to `data_generation/id10m_jam/`
 (gitignored — re-download as needed).
 
+## Annotation Guidelines
+
+The file [`ID10M-JAM Annotation Guildlines.pdf`](ID10M-JAM%20Annotation%20Guildlines.pdf) contains the annotation guidelines provided to the LLM during the confusing-context variant generation process.
+
 ## Data Generation Pipeline
 
 The `generation/` folder contains the Gemini-based pipeline used to generate the
