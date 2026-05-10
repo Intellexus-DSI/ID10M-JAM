@@ -217,6 +217,7 @@ def get_data(**kwargs) -> tuple[pd.DataFrame, pd.DataFrame]:
                 f"Expected: data_generation/id10m_fixed/{lang}.json"
             )
         test = pd.read_json(path)
+        test["language"] = lang
     else:
         missing = [p for p in _LANG_JSON.values() if not os.path.exists(p)]
         if missing:
@@ -224,7 +225,11 @@ def get_data(**kwargs) -> tuple[pd.DataFrame, pd.DataFrame]:
                 f"id10m data not found: {missing}.\n"
                 f"Expected: data_generation/id10m_fixed/{{language}}.json"
             )
-        frames = [pd.read_json(p) for p in _LANG_JSON.values()]
+        frames = []
+        for l, p in _LANG_JSON.items():
+            df = pd.read_json(p)
+            df["language"] = l
+            frames.append(df)
         test = pd.concat(frames, ignore_index=True)
 
     train_dir = os.path.join(DATA_DIR, "trainset")

@@ -99,6 +99,7 @@ def main():
     config_file = cmd_args.config_file
     with open(config_file, "r") as f:
         config = yaml.safe_load(f)
+    config["task"] = "id10m"  # this script is exclusively for the id10m task
     logger.info(f"Loaded config: {config}")
 
     if "responses_dir" in cmd_args and cmd_args.responses_dir:
@@ -179,7 +180,8 @@ def main():
 
     if config["lang"]:
         if "language" in test.columns:
-            train = train[train["language"] == config["lang"]]
+            if train is not None and "language" in train.columns:
+                train = train[train["language"] == config["lang"]]
             test = test[test["language"] == config["lang"]]
 
     if train is not None:

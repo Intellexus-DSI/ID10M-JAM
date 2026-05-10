@@ -121,6 +121,9 @@ def compute_variant_drifts(lang: str, prompt_type: str, seed: int):
     prompt_dir = "few_shot" if "few_shot" in prompt_type else "zero_shot"
     seed_dir   = f"seed_{seed}"
 
+    if not jam_lang_dir.exists():
+        return {}, []
+
     jam_model_dirs = {d.name: d for d in jam_lang_dir.iterdir() if d.is_dir()
                       and d.name != "results_summary.csv"}
 

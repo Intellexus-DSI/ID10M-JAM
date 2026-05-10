@@ -771,6 +771,10 @@ def discover_runs(lang: str, filter_str: Optional[str] = None):
     jam_base = ID10M_JAM_DIR / lang
     id10m_base = ID10M_DIR / lang
 
+    if not jam_base.exists():
+        logger.warning(f"No id10m_jam results found for {lang} at {jam_base} — skipping")
+        return
+
     for model_dir in sorted(jam_base.iterdir()):
         if not model_dir.is_dir():
             continue
