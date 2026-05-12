@@ -1,0 +1,39 @@
+# Secrets
+keys.yaml
+.env
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+venv/
+.venv/
+*.egg-info/
+
+# Encoder predictions
+encoders/predictions/
+
+# Data files (cache/downloads — committed data lives in data_generation/id10m_fixed/)
+data_generation/raw_id10m_data/
+data_generation/id10m_jam/
+
+# Experiment outputs (generated at runtime — re-create by running experiments + analysis)
+results/id10m/
+results/id10m_jam/
+results/comparisons/
+results/plots/
+results/encoders/
+
+# macOS
+.DS_Store
+
+# Weights & Biases
+wandb/
+
+# Editor
+.idea/
+.vscode/
+
+# Claude
+.claude/
