@@ -1,8 +1,8 @@
 # ID10M-JAM: Stress-Testing Idiom Identification Under Challenging Context
 
-**ACL 2026** · [[Paper]]() · [[Dataset (HuggingFace)](https://huggingface.co/datasets/Intellexus/ID10M-JAM)]
+**ACL 2026** · [[Paper]](https://aclanthology.org/2026.findings-acl.1045/) · [[Dataset (HuggingFace)](https://huggingface.co/datasets/Intellexus/ID10M-JAM)]
 
-ID10M-JAM evaluates idiom identification under challenging confusing-context conditions. We benchmark 10 LLMs across English and German on two tasks: **id10m** — a standard idiom identification task — and **id10m-jam** — our new benchmark where each idiom-containing sentence is paired with LLM-generated confusing-context variants designed to mislead models into literal interpretations.
+ID10M-JAM evaluates idiom identification under challenging, confusing-context conditions. We benchmark 10 LLMs across English and German on two tasks: **id10m** — a standard idiom identification task — and **id10m-jam** — our new benchmark where each idiom-containing sentence is paired with LLM-generated confusing-context variants designed to mislead models into literal interpretations.
 
 ---
 
@@ -198,11 +198,33 @@ If you use ID10M-JAM in your research, please cite:
 
 **BibTeX:**
 
-<!-- TODO: add -->
+​```@inproceedings{hashiloni-etal-2026-id10m,
+    title = "{ID}10{M}-{JAM}: Stress-Testing Idiom Identification Under Challenging Context",
+    author = "Hashiloni, Kai Golan  and
+      Livyatan, Lior  and
+      Hefetz, Ofri  and
+      Mannor, Alon  and
+      Cohen, Bar  and
+      Bar, Kfir",
+    editor = "Liakata, Maria  and
+      Moreira, Viviane P.  and
+      Zhang, Jiajun  and
+      Jurgens, David",
+    booktitle = "Findings of the {A}ssociation for {C}omputational {L}inguistics: {ACL} 2026",
+    month = jul,
+    year = "2026",
+    address = "San Diego, California, United States",
+    publisher = "Association for Computational Linguistics",
+    url = "https://aclanthology.org/2026.findings-acl.1045/",
+    doi = "10.18653/v1/2026.findings-acl.1045",
+    pages = "20846--20864",
+    ISBN = "979-8-89176-395-1",
+}
+​```
 
 **APA:**
 
-<!-- TODO: add -->
+Hashiloni, K. G., Livyatan, L., Hefetz, O., Mannor, A., Cohen, B., & Bar, K. (2026). ID10M-JAM: Stress-Testing Idiom Identification Under Challenging Context. In *Findings of the Association for Computational Linguistics: ACL 2026* (pp. 20846–20864). Association for Computational Linguistics.
 
 ---
 
